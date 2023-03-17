@@ -91,7 +91,7 @@ CREATE TABLE lugar(
 
 
 CREATE TABLE entradas(
-`codigo` INT (15) NOT NULL PRIMARY KEY ,
+`codigo` INT (15) NOT NULL PRIMARY KEY AUTO_INCREMENT,
 `numMesa`INT(11) NOT NULL,
 `status` VARCHAR(50) NOT NULL,
 FOREIGN KEY(`numMesa`) REFERENCES mesaEventos(`id_mesa`)

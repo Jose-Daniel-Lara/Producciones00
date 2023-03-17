@@ -1,0 +1,15 @@
+.env.php
+.env
+.env.server
+/.vagrant
+.phpunit.result.cache
+.idea
+.idea/*
+.idea/blade.xml
+.idea/.name
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/wapidelo-backend.iml
+.idea/workspace.xml
+.editorconfig

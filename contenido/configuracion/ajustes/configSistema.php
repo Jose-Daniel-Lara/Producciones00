@@ -1,15 +1,11 @@
 <?php 
 	namespace contenido\configuracion\ajustes;
+    require __DIR__.'/../../../.env';
 
-    define("URL", "http://localhost/Producciones00/");
 	define("DIRECTORY","contenido/controlador/");
 	define("CONF", "configuracion/");
 	define("MODEL", "modelo/");
 	define("CONTROLADOR", "Controlador.php");
-	define("LOCAL", "localhost");
-	define("DB", "Producciones251");
-	define("USER", "root");
-	define("PASS",""); 
 
      class configSistema{
   

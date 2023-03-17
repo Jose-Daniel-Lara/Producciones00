@@ -33,21 +33,21 @@
 
       try{
 
-        $new = $this->con->prepare("SELECT `cod_tipo`  FROM `tipoEvento` WHERE `status` = 'Disponible' and `cod_tipo` = ?");
+        $new = $this->con->prepare("SELECT `cod_tipo`  FROM `tipoevento` WHERE `status` = 'Disponible' and `cod_tipo` = ?");
         $new->bindValue(1, $this->cod_tipo);
         $new->execute();
         $data = $new->fetchAll();
 
 
         if(!isset($data[0]["cod_tipo"])){
-          $new = $this->con->prepare("SELECT `cod_tipo` FROM `tipoEvento` WHERE `status` = 'Disponible' and `tipo` = ?");
+          $new = $this->con->prepare("SELECT `cod_tipo` FROM `tipoevento` WHERE `status` = 'Disponible' and `tipo` = ?");
           $new->bindValue(1, $this->tipo);
           $new->execute();
           $data = $new->fetchAll();
 
         if(!isset($data[0]["cod_tipo"])){
 
-        $new= $this->con->prepare("INSERT INTO `tipoEvento`(`cod_tipo`, `tipo`,`status`) VALUES ( ?, ?,'Disponible')");
+        $new= $this->con->prepare("INSERT INTO `tipoevento`(`cod_tipo`, `tipo`,`status`) VALUES ( ?, ?,'Disponible')");
 
         $new->bindValue(1,$this->cod_tipo);
         $new->bindValue(2, $this->tipo);
@@ -74,7 +74,7 @@
 
  public function consultarTipo(){
       try {
-        $new = $this->con->prepare("SELECT * FROM `tipoEvento`  WHERE `status`='Disponible'");
+        $new = $this->con->prepare("SELECT * FROM `tipoevento`  WHERE `status`='Disponible'");
         $new->execute();
         $data = $new->fetchAll(\PDO::FETCH_OBJ);
         echo json_encode($data);
@@ -96,7 +96,7 @@
 
   try {
 
-    $new=$this->con->prepare("SELECT * FROM `tipoEvento`  WHERE  cod_tipo = ? ");
+    $new=$this->con->prepare("SELECT * FROM `tipoevento`  WHERE  cod_tipo = ? ");
     $new->bindValue(1, $this->id);
     $new->execute();
     $data = $new->fetchAll();
@@ -117,7 +117,7 @@
               $this->tipo=$tip;
 
             try {
-                $evento = $this->con->prepare("SELECT * FROM tipoEvento WHERE  tipo = ? and cod_tipo!=? and status='Disponible'");
+                $evento = $this->con->prepare("SELECT * FROM tipoevento WHERE  tipo = ? and cod_tipo!=? and status='Disponible'");
                 $evento->bindValue(1, $this->tipo);
                 $evento->bindValue(2, $this->codigo);
                 $evento->execute();
@@ -125,7 +125,7 @@
               
                 if (!isset($nombre[0]['tipo'])) {              
               
-                $new=$this->con->prepare("UPDATE `tipoEvento` SET `tipo`= ? WHERE `cod_tipo`= '$this->codigo' ");
+                $new=$this->con->prepare("UPDATE `tipoevento` SET `tipo`= ? WHERE `cod_tipo`= '$this->codigo' ");
                 $new->bindValue(1, $this->tipo);
                 $new->execute();
                 $mensaje = ['resultado' => 'Editado correctamente.'];
@@ -174,7 +174,7 @@ public function AnularTipoEvento($id){
 
           public function papeleraTipoEvento(){
            try {
-              $new = $this->con->prepare("SELECT * FROM `tipoEvento` WHERE `status`= 'Anulado' ");
+              $new = $this->con->prepare("SELECT * FROM `tipoevento` WHERE `status`= 'Anulado' ");
               $new->execute();
               $data = $new->fetchAll(\PDO::FETCH_OBJ);
               echo json_encode($data);
@@ -194,12 +194,12 @@ public function restaurarTipoEvento($id){
             $this->tipoEvento=$id;
 
             try {
-              $evento = $this->con->prepare("SELECT tipo FROM tipoEvento WHERE  cod_tipo =? ");
+              $evento = $this->con->prepare("SELECT tipo FROM tipoevento WHERE  cod_tipo =? ");
               $evento->bindValue(1, $this->tipoEvento);
               $evento->execute();
               $nombre = $evento->fetchAll();
 
-              $muestra = $this->con->prepare("SELECT tipo  FROM tipoEvento WHERE  status='Disponible' ");
+              $muestra = $this->con->prepare("SELECT tipo  FROM tipoevento WHERE  status='Disponible' ");
               $muestra->execute();
               $nombre2 = $muestra->fetchAll();
 
@@ -209,7 +209,7 @@ public function restaurarTipoEvento($id){
                   die();
               }
               else{
-               $new=$this->con->prepare("UPDATE `tipoEvento` SET `status` = 'Disponible' WHERE `cod_tipo`= '$this->tipoEvento' ");
+               $new=$this->con->prepare("UPDATE `tipoevento` SET `status` = 'Disponible' WHERE `cod_tipo`= '$this->tipoEvento' ");
                $new->execute();
                $mensaje = ['resultado' => 'Restaurado.'];
                echo json_encode($mensaje);
