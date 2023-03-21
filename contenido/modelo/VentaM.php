@@ -3,8 +3,9 @@ namespace contenido\modelo;
 use contenido\configuracion\conexion\BDConexion as BDConexion;
 
 class VentaM extends BDConexion{
-    const E_DISPONIBLE = 'Disponible';
-    const E_ANULADA = 'Anulada';
+    const VENTA_ESTATUS_DISPONIBLE = 'Disponible';
+    const VENTA_ESTATUS_ANULADO = 'Anulado';
+
     private $numeroVenta;
     private $cedula;
     private $metodoPago;
@@ -34,7 +35,7 @@ class VentaM extends BDConexion{
      * @param $status
      */
     public function setData($numeroVenta, $cedula, $metodoPago, $descripcionVenta, $fecha,
-                                $hora, $montoTotal, $status)
+                            $hora, $montoTotal, $status)
     {
         $this->numeroVenta = $numeroVenta;
         $this->cedula = $cedula;
@@ -44,6 +45,63 @@ class VentaM extends BDConexion{
         $this->hora = $hora;
         $this->montoTotal = $montoTotal;
         $this->status = $status;
+    }
+
+    public function insertVenta(VentaM $venta){
+        try {
+            $strSql = "INSERT INTO ventas (cedula,metodoPago,descripcionVenta,fecha,hora,montoTotal,status) ";
+            $strSql .= "VALUES(?,?,?,?,?,?,?)";
+
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, $venta->getCedula());
+            $new->bindValue(2, $venta->getMetodoPago());
+            $new->bindValue(3, $venta->getDescripcionVenta());
+            $new->bindValue(4, $venta->getFecha());
+            $new->bindValue(5, $venta->getHora());
+            $new->bindValue(6, $venta->getMontoTotal());
+            $new->bindValue(7, $venta->getStatus());
+            $new->execute();
+            return [
+                'success'=> true,
+                'data'=>$this->con->lastInsertId(),
+                'msj' => ''
+            ];
+        }catch(\Exception $e) {
+            return [
+                'success'=> false,
+                'data'=>-1,
+                'msj' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function updateVenta(VentaM $venta){
+        try {
+            $strSql ="UPDATE ventas SET cedula=?, metodoPago=?, descripcionVenta=?,fecha=?,hora=?,";
+            $strSql .="montoTotal=?, status=?  WHERE numeroVenta=?";
+
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, $venta->getCedula());
+            $new->bindValue(2, $venta->getMetodoPago());
+            $new->bindValue(3, $venta->getDescripcionVenta());
+            $new->bindValue(4, $venta->getFecha());
+            $new->bindValue(5, $venta->getHora());
+            $new->bindValue(6, $venta->getMontoTotal());
+            $new->bindValue(7, $venta->getStatus());
+            $new->bindValue(8, $venta->getNumeroVenta());
+            $new->execute();
+            return [
+                'success'=> true,
+                'data'=>null,
+                'msj' => ''
+            ];
+        }catch(\Exception $e) {
+            return [
+                'success'=> false,
+                'data'=>-1,
+                'msj' => $e->getMessage()
+            ];
+        }
     }
 
     /**
@@ -172,63 +230,6 @@ class VentaM extends BDConexion{
     public function setStatus($status): void
     {
         $this->status = $status;
-    }
-
-    public function insertVenta(Venta $venta){
-        try {
-            $strSql = "INSERT INTO ventas (cedula,metodoPago,descripcionVenta,fecha,hora,montoTotal,status) ";
-            $strSql .= "VALUES(?,?,?,?,?,?,?)";
-
-            $new= $this->con->prepare($strSql);
-            $new->bindValue(1, $venta->getCedula());
-            $new->bindValue(2, $venta->getMetodoPago());
-            $new->bindValue(3, $venta->getDescripcionVenta());
-            $new->bindValue(4, $venta->getFecha());
-            $new->bindValue(5, $venta->getHora());
-            $new->bindValue(6, $venta->getMontoTotal());
-            $new->bindValue(7, $venta->getStatus());
-            $new->execute();
-            return [
-                'success'=> true,
-                'data'=>$this->con->lastInsertId(),
-                'msj' => ''
-                ];
-        }catch(\Exception $e) {
-            return [
-                'success'=> false,
-                'data'=>-1,
-                'msj' => $e->getMessage()
-            ];
-        }
-    }
-
-    public function updateVenta(Venta $venta){
-        try {
-            $strSql ="UPDATE ventas SET cedula=?, metodoPago=?, descripcionVenta=?,fecha=?,hora=?,";
-            $strSql .="montoTotal=?, status=?  WHERE numeroVenta=?";
-
-            $new= $this->con->prepare($strSql);
-            $new->bindValue(1, $venta->getCedula());
-            $new->bindValue(2, $venta->getMetodoPago());
-            $new->bindValue(3, $venta->getDescripcionVenta());
-            $new->bindValue(4, $venta->getFecha());
-            $new->bindValue(5, $venta->getHora());
-            $new->bindValue(6, $venta->getMontoTotal());
-            $new->bindValue(7, $venta->getStatus());
-            $new->bindValue(8, $venta->getNumeroVenta());
-            $new->execute();
-            return [
-                'success'=> true,
-                'data'=>null,
-                'msj' => ''
-            ];
-        }catch(\Exception $e) {
-            return [
-                'success'=> false,
-                'data'=>-1,
-                'msj' => $e->getMessage()
-            ];
-        }
     }
 
 

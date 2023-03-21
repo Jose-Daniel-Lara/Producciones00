@@ -30,14 +30,14 @@ use contenido\componentes\componentes as varComponentes;
        <div clas="justify-content-en text-end">
         
         <a class="nav-link nav-profile d-flex align-items-center mt-1" href="#" data-bs-toggle="dropdown">
-            <img src="<?php echo $_SESSION['imagen']; ?>" width="40" height="40"alt="Profile" class="rounded-circle">
+            <img src="assets/img/<?php echo $_SESSION['imagen']; ?>" width="40" height="40"alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block p-2 nombre"><?php echo $_SESSION['usuario']; ?></span>
         </a>
 
           <ul class="dropdown-menu dropdown-menu-center dropdown-menu-arrow profile card-header mt-2">
             <li class="dropdown-header">
               <div class="justify-content-center text-center m-auto">
-                 <img src="<?php echo $_SESSION['imagen']; ?>" width="75" height="75"alt="Profile" class="rounded-circle mb-2 ">
+                 <img src="assets/img/<?php echo $_SESSION['imagen']; ?>" width="75" height="75"alt="Profile" class="rounded-circle mb-2 ">
                  <h6 class="titulo fw-bold" style="color:  #fff;"><?php echo $_SESSION['usuario']; ?></h6>
               <span style="color: #c79b2d !important;"><?php echo $_SESSION['tipoUsuario']; ?></span>
               </div>

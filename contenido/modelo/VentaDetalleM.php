@@ -45,6 +45,65 @@ class VentaDetalleM extends BDConexion{
         $this->status = $status;
     }
 
+    public function insertVentaDetalle(VentaDetalleM $vd){
+        try {
+            $strSql = "INSERT INTO detalleventa (idVenta,evento,id_mesa,cantEntradas,precio,descuento,subTotal,status) ";
+            $strSql .= "VALUES(?,?,?,?,?,?,?,?)";
+
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, $vd->getVentaId());
+            $new->bindValue(2, $vd->getEventoId());
+            $new->bindValue(3, $vd->getMesaId());
+            $new->bindValue(4, $vd->getCantEntradas());
+            $new->bindValue(5, $vd->getPrecio());
+            $new->bindValue(6, $vd->getDescuento());
+            $new->bindValue(7, $vd->getSubTotal());
+            $new->bindValue(8, $vd->getStatus());
+            $new->execute();
+            return [
+                'success'=> true,
+                'data'=>$this->con->lastInsertId(),
+                'msj' => ''
+            ];
+        }catch(\Exception $e) {
+            return [
+                'success'=> false,
+                'data'=>-1,
+                'msj' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function updateVentaDetalle(VentaDetalleM $vd){
+        try {
+            $strSql ="UPDATE detalleventa SET idVenta=?, evento=?, id_mesa=?,cantEntradas=?,precio=?,";
+            $strSql .="descuento=?, subTotal=?, status=? WHERE codigo=?";
+
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, $vd->getVentaId());
+            $new->bindValue(2, $vd->getEventoId());
+            $new->bindValue(3, $vd->getMesaId());
+            $new->bindValue(4, $vd->getCantEntradas());
+            $new->bindValue(5, $vd->getPrecio());
+            $new->bindValue(6, $vd->getDescuento());
+            $new->bindValue(7, $vd->getSubTotal());
+            $new->bindValue(8, $vd->getStatus());
+            $new->bindValue(9, $vd->getCodigo());
+            $new->execute();
+            return [
+                'success'=> true,
+                'data'=>null,
+                'msj' => ''
+            ];
+        }catch(\Exception $e) {
+            return [
+                'success'=> false,
+                'data'=>-1,
+                'msj' => $e->getMessage()
+            ];
+        }
+    }
+
     /**
      * @return mixed
      */
@@ -187,65 +246,6 @@ class VentaDetalleM extends BDConexion{
     public function setStatus($status): void
     {
         $this->status = $status;
-    }
-
-    public function insertVentaDetalle(VentaDetalle $vd){
-        try {
-            $strSql = "INSERT INTO detalleventa (idVenta,evento,id_mesa,cantEntradas,precio,descuento,subTotal,status) ";
-            $strSql .= "VALUES(?,?,?,?,?,?,?,?)";
-
-            $new= $this->con->prepare($strSql);
-            $new->bindValue(1, $vd->getVentaId());
-            $new->bindValue(2, $vd->getEventoId());
-            $new->bindValue(3, $vd->getMesaId());
-            $new->bindValue(4, $vd->getCantEntradas());
-            $new->bindValue(5, $vd->getPrecio());
-            $new->bindValue(6, $vd->getDescuento());
-            $new->bindValue(7, $vd->getSubTotal());
-            $new->bindValue(8, $vd->getStatus());
-            $new->execute();
-            return [
-                'success'=> true,
-                'data'=>$this->con->lastInsertId(),
-                'msj' => ''
-            ];
-        }catch(\Exception $e) {
-            return [
-                'success'=> false,
-                'data'=>-1,
-                'msj' => $e->getMessage()
-            ];
-        }
-    }
-
-    public function updateVentaDetalle(VentaDetalle $vd){
-        try {
-            $strSql ="UPDATE detalleventa SET idVenta=?, evento=?, id_mesa=?,cantEntradas=?,precio=?,";
-            $strSql .="descuento=?, subTotal=?, status=? WHERE codigo=?";
-
-            $new= $this->con->prepare($strSql);
-            $new->bindValue(1, $vd->getVentaId());
-            $new->bindValue(2, $vd->getEventoId());
-            $new->bindValue(3, $vd->getMesaId());
-            $new->bindValue(4, $vd->getCantEntradas());
-            $new->bindValue(5, $vd->getPrecio());
-            $new->bindValue(6, $vd->getDescuento());
-            $new->bindValue(7, $vd->getSubTotal());
-            $new->bindValue(8, $vd->getStatus());
-            $new->bindValue(9, $vd->getCodigo());
-            $new->execute();
-            return [
-                'success'=> true,
-                'data'=>null,
-                'msj' => ''
-            ];
-        }catch(\Exception $e) {
-            return [
-                'success'=> false,
-                'data'=>-1,
-                'msj' => $e->getMessage()
-            ];
-        }
     }
 
 }

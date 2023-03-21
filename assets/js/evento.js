@@ -1,4 +1,246 @@
-//------------------------------- FUNCION MOSTRAR AJAX ------------------------------//
+imagen_input = document.getElementById("image");
+imagen_img = document.getElementById("imgPreview");
+imagen_input.onchange = evt => {
+	const [file] = imagen_input.files
+	if (file) {
+		imagen_img.src = URL.createObjectURL(file)
+	}
+}
+
+$(document).ready(function(e){
+	var modalCrud = new bootstrap.Modal(document.getElementById('crudEvento'));
+
+	$(".btn-crud-evento").on("click", function(){
+		let evento_id = $(this).data('codigo');
+		let op = parseInt(evento_id) > 0 ? 'updateEvento' : 'addEvento';
+
+		if (parseInt(evento_id)>0 && $(this).data('status')===E_STATUS_OCUPADO){
+			Swal.fire({
+				icon: 'error',
+				title: 'Operación No Permitida',
+				text: 'El Evento está ' + E_STATUS_OCUPADO,
+			})
+			return false;
+		}
+
+		$('#hid_op').val(op);
+		$('#hid_codigo_evento').val(evento_id);
+		console.log('op: ' + op);
+		console.log('codigo: ' + evento_id);
+
+		if (parseInt(evento_id) >0){
+			$("#eventoNombre").empty().val($(this).data('nombre'));
+			$("#tipoEvento").val($(this).data('tipo'));
+			$("#lugares").val($(this).data('lugar'));
+			$("#entradas").empty().val($(this).data('entradas'));
+			$("#fecha").empty().val($(this).data('fecha'));
+			$("#hora").empty().val($(this).data('hora'));
+			if ($(this).data('imagen').trim() === ''){
+				$("#imgPreview").attr('src','assets/img/default_placeholder.jpg');
+			}else{
+				$("#imgPreview").attr('src',$(this).data('imagen'));
+			}
+			$("#imagen_anterior").empty().val($(this).data('imagen'));
+			$("#image").empty();
+			$("#estatus_evento").empty().val($(this).data('status'));
+		}else{
+			$("#eventoNombre").empty();
+			$("#entradas").empty();
+			$("#fecha").empty();
+			$("#hora").empty();
+			$("#imgPreview").attr('src','assets/img/default_placeholder.jpg');
+			$("#image").empty();
+			$("#imagen_anterior").val("");
+			$("#estatus_evento").val(E_STATUS_DISPONIBLE);
+		}
+
+		//$('#crudEvento').modal({ show:true });
+		modalCrud.show();
+	});
+
+	$(".btn-delete-evento").on("click", function (){
+		let codigo = $(this).data('codigo');
+		let status = $(this).data('status');
+		if (status===E_STATUS_OCUPADO){
+			Swal.fire({
+				icon: 'error',
+				title: 'Operación No Permitida',
+				text: 'El Evento está ' + E_STATUS_OCUPADO,
+			})
+		}else{
+			swal.fire({
+				title: '¿Seguro de Anular este Evento?',
+				text: "Continúe para confirmar la Anulación...",
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Si, Anular!',
+			}).then((result) => {
+				if (result.value){
+					$.ajax({
+						url: '?url=eventos',
+						type: 'POST',
+						data: {
+							op: 'anularEvento',
+							codigo: codigo
+						},
+						dataType: 'json'
+					})
+						.done(function(response){
+							if (response.success){
+								swal.fire('Anulado!', 'Evento Anulado', 'success');
+							}else{
+								swal.fire('Anulado!', response.msj, 'success');
+							}
+							location.href='?url=eventos';
+						})
+						.fail(function(){
+							swal.fire('Upsss...', '¡Algo salió mal al anular!', 'error');
+						});
+				} // fin de if (result.value)
+			})
+		}//fin del else
+	})
+
+	$(".restaurar-ev").on("click", function (){
+		let codigo = $(this).data('codigo');
+
+		swal.fire({
+			title: '¿Seguro de Restaurar este Evento?',
+			text: "Continúe para confirmar la Restauración...",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Si, Restaurar!',
+		}).then((result) => {
+			if (result.value) {
+				$.ajax({
+					url: '?url=eventos',
+					type: 'POST',
+					data: {
+						op: 'restaurarEvento',
+						codigo: codigo
+					},
+					dataType: 'json'
+				})
+					.done(function (response) {
+						if (response.success) {
+							swal.fire('Restaurado!', 'Evento Restaurado', 'success');
+						} else {
+							swal.fire('Upsss...', response.msj, 'error');
+						}
+						location.href = '?url=eventos';
+					})
+					.fail(function () {
+						swal.fire('Upsss...', '¡Algo salió mal al anular!', 'error');
+					});
+			} // fin de if (result.value)
+		})
+	})
+
+	$('#envioDataEvento').on('click', function () {
+		if (validarDataEvento()){
+			let msjOperacion = $("#hid_op").val() == 'addEvento' ? 'Registrado' : 'Actualizado';
+			let formData = new FormData();
+			formData.append('op',$("#hid_op").val());
+			formData.append('codigo',$("#hid_codigo_evento").val());
+			formData.append('evento',$("#eventoNombre").val().trim());
+			formData.append('tipo',$("#tipoEvento").val());
+			formData.append('lugar',$("#lugares").val().trim());
+			formData.append('entradas',$("#entradas").val());
+			formData.append('fecha',$("#fecha").val());
+			formData.append('hora',$("#hora").val());
+			formData.append('imagen',$("#image").val().trim());
+			formData.append('imagen_anterior',$("#imagen_anterior").val().trim());
+			formData.append('status',$('#estatus_evento').val())
+			let files = $('#image')[0].files[0];
+			if (files) {
+				formData.append('file',files);
+			}
+			$.ajax({
+				url: '?url=eventos',
+				type: 'post',
+				data: formData,
+				contentType: false,
+				processData: false,
+				async: false
+			})
+				.done(function(response) {
+					let resp = JSON.parse(response);
+					if (resp.success){
+						Swal.fire({
+							title:'<h3 style="color:#040855!important;"><b>' + msjOperacion + '</b></h3>',
+							html:'<p style="color:#bbb!important;">Evento ' + msjOperacion + ' Exitosamente!</p> <br> <div class="modal-footer"> </div>',
+							showConfirmButton:false,
+							timer:2500,
+							timerProgressBar:true,
+							imageUrl:'assets/img/check.png',
+							imageWidth:'180px',
+							imageHeight:'140px',
+							imageAlt:'registrado'
+						}).then(()=>{
+							location.href="?url=eventos";
+						})
+					}else{
+						swal.fire('Upsss...', '¡Algo salió mal al grabar!', 'error');
+						location.href="?url=eventos";
+					}
+				})
+			return false;
+		}
+	})
+})
+
+function validarDataEvento(){
+	let ok = true;
+
+	if($("#eventoNombre").val().trim().length < 10 || $("#eventoNombre").val().trim().length>30){
+		$("#errorEventoNombre").html('<i class="bi bi-exclamation-triangle-fill" ></i>El nombre del Evento debe contener entre 10 y 30 caracteres.');
+		ok = false;
+	}else{
+		$("#errorEventoNombre").html("");
+	}
+
+	if ($("#tipoEvento").val() == null || $("#tipoEvento").val().trim().length === 0) {
+		$("#errortipoEvento").html('<i class="bi bi-exclamation-triangle-fill"></i>Seleccione el Tipo de Evento.');
+		ok = false;
+	}else{
+		$("#errortipoEvento").html("");
+	}
+
+	if ($("#lugares").val() == null || $("#lugares").val().trim().length === 0) {
+		$("#errorLugares").html('<i class="bi bi-exclamation-triangle-fill"></i>Seleccione el Lugar.');
+		ok = false;
+	}else{
+		$("#errorLugares").html("");
+	}
+
+	if($("#entradas").val().trim().length === 0){
+		$("#errorEntradas").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese la Cantidad de Entradas.');
+		ok = false;
+	}else{
+		$("#errorEntradas").html("");
+	}
+
+	if ($("#fecha").val().trim().length < 1) {
+		$("#errorFecha").html('<i  class="bi bi-exclamation-triangle-fill"></i> Ingrese la fecha');
+		ok = false;
+	}else{
+		$("#errorFecha").html("");
+	}
+
+	if ($("#hora").val().trim().length < 1) {
+		$("#errorHora").html('<i  class="bi bi-exclamation-triangle-fill"></i> Ingrese la hora');
+		ok = false;
+	}else{
+		$("#errorHora").html("");
+	}
+	return ok;
+}
+
+/*
 
 let tabla ;
 mostrarTabla();
@@ -60,7 +302,6 @@ $(document).ready(function(){
 
 });
 
-////---------------------------MOSTRAR SELECT LUGAR-------------------------------
 mostrarLugar();
 let inpu2;
 inpu2= '<option value="lugar" class="opcion" >Lugares</option>';
@@ -479,4 +720,4 @@ mostrarTablaR();
 
       }
     })
-  })
+  })*/

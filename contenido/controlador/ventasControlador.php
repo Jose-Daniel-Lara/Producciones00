@@ -13,9 +13,9 @@ define('IS_AJAX', isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVE
 use contenido\componentes\carrusel as carrusel;
 use contenido\modelo\muestraM as muestraM;
 use contenido\modelo\eventoM as Evento;
-use contenido\modelo\area as Area;
+use contenido\modelo\areaM as Area;
 use contenido\modelo\mesasM as Mesa;
-use contenido\modelo\Venta;
+use contenido\modelo\VentaM;
 use contenido\modelo\VentaDetalle;
 
 if (IS_AJAX){
@@ -55,27 +55,6 @@ if (IS_AJAX){
             break;
     }
 
-    //$mostrarClientes= $objeto->consultarClientes();
-
-    if (isset($_GET['$evento']) && isset($_GET['rellenar'])) {
-        $info= $objeto->info($_GET['$evento']);
-    }
-
-    if (isset($_POST['$area'])) {
-        $area= $objeto->area($_POST['$area']);
-    }
-
-    if (isset($_POST['$mesa'])) {
-        $mesa= $objeto->mesas($_POST['$mesa']);
-    }
-
-    ///////////////////-------Listar Ventas--------////////////
-    ///////////////////-------Registrar--------////////////
-    ///////////////////-------Eliminar--------////////////
-    ///////////////////-------Mostrar--------////////////
-    ///////////////////-------Papelera--------////////////
-    ///////////////////-------Restaurar--------////////////
-
     if(file_exists("vista/registrarVentasV.php")) {
         require_once("vista/registrarVentasV.php");
     }
@@ -88,7 +67,7 @@ if (IS_AJAX){
         $objEvento = new Evento();
         $search = !isset($request['search']) ? "" : $request['search'];
         $limit  = !isset($request['limit']) ? 20 : $request['limit'];
-        $resp = $objEvento->getListaSelectEventos($search,$limit);
+        $resp = $objEvento->getListaSelectEventosByStatus($search,$limit,Evento::EVENTO_STATUS_OCUPADO);
 
         return $resp;
     }
