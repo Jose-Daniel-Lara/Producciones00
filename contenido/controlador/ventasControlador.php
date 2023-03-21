@@ -15,8 +15,8 @@ use contenido\modelo\muestraM as muestraM;
 use contenido\modelo\eventoM as Evento;
 use contenido\modelo\areaM as Area;
 use contenido\modelo\mesasM as Mesa;
-use contenido\modelo\VentaM;
-use contenido\modelo\VentaDetalle;
+use contenido\modelo\VentaM as Venta;
+use contenido\modelo\VentaDetalleM as VentaDetalle;
 
 if (IS_AJAX){
     switch($_REQUEST['op']){
@@ -41,7 +41,7 @@ if (IS_AJAX){
             break;
     }
 }else{
-    $objeto = new muestraM();
+    $objeto = new Venta();
     $carrusel=new carrusel;
 
     $operation = isset($_REQUEST['op']) ? $_REQUEST['op'] : 'listVentas';
@@ -49,7 +49,7 @@ if (IS_AJAX){
         case 'listVentas':
             $dataVentas = getListVentas($objeto);
             $metodoPago = getListMetodos($_REQUEST, $objeto);
-            $evento     = getListEventos($_REQUEST, $objeto);
+            //$evento     = getListEventos($_REQUEST, $objeto);
             break;
         case 'store':
             break;
@@ -98,7 +98,7 @@ if (IS_AJAX){
             $venta->getConexion()->beginTransaction();
 
             $venta->setData(0,$request['cedula'], $request['metodo'],$request['descripcion'],
-                $request['fecha'],$request['hora'],$request['total'],Venta::E_DISPONIBLE);
+                $request['fecha'],$request['hora'],$request['total'],Venta::VENTA_ESTATUS_DISPONIBLE);
             $resp = $venta->insertVenta($venta);
             if ($resp['success']){
                 $lastVentaId = $resp['data'];

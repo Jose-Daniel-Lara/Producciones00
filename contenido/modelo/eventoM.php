@@ -445,7 +445,7 @@ class eventoM extends BDConexion
             $new->bindValue(1, $evento->getCodigo());
             $new->bindValue(2, $evento->getNombre());
             $new->bindValue(3, $evento->getTipoEvento());
-            $new->bindValue(4, $evento->getLugar());
+            $new->bindValue(4, $evento->getLugares());
             $new->bindValue(5, $evento->getEntradas());
             $new->bindValue(6, $evento->getFecha());
             $new->bindValue(7, $evento->getHora());
@@ -474,7 +474,7 @@ class eventoM extends BDConexion
             $new= $this->con->prepare($strSql);
             $new->bindValue(1, $evento->getNombre());
             $new->bindValue(2, $evento->getTipoEvento());
-            $new->bindValue(3, $evento->getLugar());
+            $new->bindValue(3, $evento->getLugares());
             $new->bindValue(4, $evento->getEntradas());
             $new->bindValue(5, $evento->getFecha());
             $new->bindValue(6, $evento->getHora());

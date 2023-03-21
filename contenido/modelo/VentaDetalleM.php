@@ -104,6 +104,33 @@ class VentaDetalleM extends BDConexion{
         }
     }
 
+    public function getListaVentaDetalle($venta_id){
+        try {
+            $strSql ="SELECT dv.*,e.nombre as nombre_evento, CONCAT('Mesa ',m.cantPuesto,'Ptos. ',m.precio,'$') as titulo_mesa " .
+                "FROM detalleventa dv INNER JOIN mesas m " .
+                "ON m.id_mesa = dv.id_mesa " .
+                "INNER JOIN eventos e ON dv.evento=e.codigo " .
+                "WHERE dv.idVenta=? AND dv.status='" . self::E_DISPONIBLE . "' " .
+                "ORDER BY dv.codigo ASC";
+
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, $venta_id);
+            $new->execute();
+            $data = $new->fetchAll(\PDO::FETCH_OBJ);
+            return [
+                'success'=> true,
+                'data'=>$data,
+                'msj' => ''
+            ];
+        }catch(\Exception $e) {
+            return [
+                'success'=> false,
+                'data'=>null,
+                'msj' => $e->getMessage()
+            ];
+        }
+    }
+
     /**
      * @return mixed
      */

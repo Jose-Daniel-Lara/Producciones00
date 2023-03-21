@@ -68,7 +68,8 @@ $carrusel->carruselEventos();
                                             data-evento="<?php echo $data->evento ?>" data-area="<?php echo $data->area ?>"
                                             data-columna="<?php echo $data->posiColumna ?>" data-fila="<?php echo $data->posiFila ?>"
                                             data-puestos="<?php echo $data->cantPuesto ?>" data-precio="<?php echo $data->precio ?>"
-                                            data-status="<?php echo $data->status ?>" data-nombre_evento="<?php echo $data->nombre_evento ?>">
+                                            data-status="<?php echo $data->status ?>" data-nombre_evento="<?php echo $data->nombre_evento ?>"
+                                            data-status_evento="<?php echo $data->status_evento ?>">
                                         <i class="bi bi-pencil-fill "></i>
                                     </button>
 

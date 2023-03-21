@@ -403,13 +403,15 @@ function getDataForm(operation){
     let arrayDetails = [];
     $('#ventass #tt #tr').each( function(){
         let fila = $(this);
+        let subTotal = fila.find('.value-subtotal').val();
+        let descuento = subTotal - parseFloat(fila.find('.value-descuento').val());
         let detail = {
             area: fila.find('.select-areas').val(),
             mesa: fila.find('.select-mesas').val(),
             entradas: fila.find('.value-entradas').val(),
             precio: fila.find('.value-precio').val(),
             subtotal: fila.find('.value-subtotal').val(),
-            descuento: fila.find('.value-descuento').val()
+            descuento: descuento
         }
         arrayDetails.push(detail);
     })

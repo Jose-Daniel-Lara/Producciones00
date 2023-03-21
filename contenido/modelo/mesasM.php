@@ -3,7 +3,8 @@
 namespace contenido\modelo;
 
 use contenido\configuracion\conexion\BDConexion as BDConexion;
-
+use contenido\modelo\mesasM as Mesa;
+use contenido\modelo\eventoM as Evento;
 
 class mesasM extends BDConexion
 {
@@ -192,194 +193,126 @@ class mesasM extends BDConexion
         }
     }
 
-    public function modificarMesa($event, $ar, $pre, $pColumna, $pFila, $numPuesto, $id)
+    public function modificarMesa(Mesa $objMesa)
     {
-        $this->codigo = $id;
-        $this->evento = $event;
-        $this->nombArea = $ar;
-        $this->precio = $pre;
-        $this->posiColumna = $pColumna;
-        $this->posiFila = $pFila;
-        $this->cantPuesto = $numPuesto;
-
         try {
-
-            $estado = $this->con->prepare("SELECT e.status FROM entradas e INNER JOIN mesas m ON e.numMesa=m.id_mesa WHERE m.id_mesa=? ");
-            $estado->bindValue(1, $this->codigo);
-            $estado->execute();
-            $es = $estado->fetchAll();
-
-            if ($es[0]['status'] == 'Ocupado') {
-
-                $mensaje = ['resultado' => 'NO modificar'];
-                echo json_encode($mensaje);
-                die();
-
-            }
-            if ($es[0]['status'] == 'Disponible') {
-
-                $mesa = $this->con->prepare("SELECT posiColumna, posiFila FROM mesas WHERE  posiColumna = ? and posiFila=?  and evento=? and id_mesa!=? and status='Disponible'");
-                $mesa->bindValue(1, $this->posiColumna);
-                $mesa->bindValue(2, $this->posiFila);
-                $mesa->bindValue(3, $this->evento);
-                $mesa->bindValue(4, $this->codigo);
+            if ($objMesa->getStatus() == self::MESA_STATUS_DISPONIBLE) {
+                $mesa = $this->con->prepare("SELECT posiColumna, posiFila FROM mesas WHERE  posiColumna = ? and posiFila=?  and evento=? and id_mesa!=? and status='" . self::MESA_STATUS_DISPONIBLE . "'");
+                $mesa->bindValue(1, $objMesa->getPosiColumna());
+                $mesa->bindValue(2, $objMesa->getPosiFila());
+                $mesa->bindValue(3, $objMesa->getEvento());
+                $mesa->bindValue(4, $objMesa->getIdMesa());
                 $mesa->execute();
                 $nombre = $mesa->fetchAll();
 
                 if (!isset($nombre[0]['posiColumna']) && !isset($nombre[0]['posiFila'])) {
-
-                    $info = $this->con->prepare("SELECT  cantPuesto FROM mesas WHERE `status` = 'Disponible' and id_mesa=? ");
-                    $info->bindValue(1, $this->codigo);
+                    $info = $this->con->prepare("SELECT  cantPuesto FROM mesas WHERE `status` = '" . self::MESA_STATUS_DISPONIBLE . "' and id_mesa=? ");
+                    $info->bindValue(1, $objMesa->getIdMesa());
                     $info->execute();
                     $xx = $info->fetchAll();
 
-                    if ($this->cantPuesto < $xx[0]['cantPuesto']) {
-
-                        $e = $this->con->prepare("SELECT status FROM eventos WHERE `status` != 'Anulado' and nombre = ?");
-                        $e->bindValue(1, $this->evento);
+                    if ($objMesa->getCantPuesto() < $xx[0]['cantPuesto']) {
+                        $e = $this->con->prepare("SELECT status FROM eventos WHERE `status` != '" . Evento::EVENTO_STATUS_ANULADO . "' and codigo = ?");
+                        $e->bindValue(1, $objMesa->getEvento());
                         $e->execute();
                         $estado1 = $e->fetchAll();
 
-                        if ($estado1[0]['status'] == 'Ocupado') {
-                            $mostrar = $this->con->prepare("UPDATE `eventos` SET `status`='Disponible' WHERE `nombre` = ? ");
-                            $mostrar->bindValue(1, $this->evento);
+                        if ($estado1[0]['status'] == Evento::EVENTO_STATUS_OCUPADO) {
+                            $mostrar = $this->con->prepare("UPDATE `eventos` SET `status`='" . Evento::EVENTO_STATUS_DISPONIBLE . "' WHERE `codigo` = ? ");
+                            $mostrar->bindValue(1, $objMesa->getEvento());
                             $mostrar->execute();
                         }
-//------------------------------------------------------------------------------------------------
-                        $consultar = $this->con->prepare("SELECT * FROM mesas m INNER JOIN entradas e ON m.id_mesa=e.numMesa WHERE m.id_mesa=' $this->codigo'");
+
+                        $consultar = $this->con->prepare("SELECT * FROM mesas m INNER JOIN entradas e ON m.id_mesa=e.numMesa WHERE m.id_mesa='" . $objMesa->getIdMesa() . "'");
                         $consultar->execute();
                         $data = $consultar->fetchAll();
 
                         if (isset($data[0]['id_mesa'])) {
-
-                            $eliminar = $this->con->prepare("DELETE FROM entradas WHERE numMesa='$this->codigo'");
+                            $eliminar = $this->con->prepare("DELETE FROM entradas WHERE numMesa='" . $objMesa->getIdMesa() . "'");
                             $eliminar->execute();
 
-
-                            $new = $this->con->prepare("UPDATE `mesas` SET `evento`= ?, `area`= ?, `precio`=?, `posiColumna`=?, `posiFila`= ? , cantPuesto= ? WHERE `id_mesa`= '$this->codigo' ");
-                            $new->bindValue(1, $this->evento);
-                            $new->bindValue(2, $this->nombArea);
-                            $new->bindValue(3, $this->precio);
-                            $new->bindValue(4, $this->posiColumna);
-                            $new->bindValue(5, $this->posiFila);
-                            $new->bindValue(6, $this->cantPuesto);
-                            $new->execute();
-                            $id = $this->codigo;
-                            $num_elementos = 0;
-                            $sw = true;
-
-                            while ($num_elementos < $this->cantPuesto) {
-
-                                $this->registrarEntradas($id) or $sw = false;
-
-                                $num_elementos = $num_elementos + 1;
-
+                            $result = $this->updateMesa($objMesa);
+                            // Ahora se crean y registran las Entradas
+                            $objEntrada = new Entrada();
+                            $arrEntradas = [];
+                            for ($i=0; $i<$objMesa->getCantPuesto(); $i++){
+                                $entrada = [
+                                    'numMesa' => $objMesa->getIdMesa(),
+                                    'status' => Entrada::ENTRADA_STATUS_DISPONIBLE
+                                ];
+                                $arrEntradas[] = $entrada;
                             }
-
-                            $mensaje = array('resultado' => 'modificado correctamente.');
-                            echo json_encode($mensaje);
-                            die();
-
+                            $resp = $objEntrada->insertBatchEntradas($arrEntradas);
+                            return ['success'=>true, 'data'=>null, 'msj'=>''];
                         }
                     }
-                    if ($this->cantPuesto > $xx[0]['cantPuesto']) {
-
-                        $puestos = $this->con->prepare("SELECT SUM(cantPuesto) as puestos FROM mesas WHERE `status` = 'Disponible' and evento = ? and id_mesa!=?");
-                        $puestos->bindValue(1, $this->evento);
-                        $puestos->bindValue(2, $this->codigo);
+                    if ($objMesa->getCantPuesto() > $xx[0]['cantPuesto']) {
+                        $puestos = $this->con->prepare("SELECT SUM(cantPuesto) as puestos FROM mesas WHERE `status` = '" . Mesa::MESA_STATUS_DISPONIBLE . "' and evento = ? and id_mesa!=?");
+                        $puestos->bindValue(1, $objMesa->getEvento());
+                        $puestos->bindValue(2, $objMesa->getIdMesa());
                         $puestos->execute();
                         $suma = $puestos->fetchAll();
 
-                        $evento = $this->con->prepare("SELECT entradas FROM eventos WHERE `status` = 'Disponible' and nombre = ?");
-                        $evento->bindValue(1, $this->evento);
+                        $evento = $this->con->prepare("SELECT entradas FROM eventos WHERE `status` = '" . Evento::EVENTO_STATUS_DISPONIBLE . "' and codigo = ?");
+                        $evento->bindValue(1, $objMesa->getEvento());
                         $evento->execute();
                         $entradas = $evento->fetchAll();
 
                         $cal = ($entradas[0]['entradas']) - ($suma[0]['puestos']);
 
-                        if ($this->cantPuesto <= $cal) {
-
-                            $consultar = $this->con->prepare("SELECT * FROM mesas m INNER JOIN entradas e ON m.id_mesa=e.numMesa WHERE m.id_mesa=' $this->codigo'");
+                        if ($objMesa->getCantPuesto() <= $cal) {
+                            $consultar = $this->con->prepare("SELECT * FROM mesas m INNER JOIN entradas e ON m.id_mesa=e.numMesa WHERE m.id_mesa='". $objMesa->getIdMesa() . "'");
                             $consultar->execute();
                             $data = $consultar->fetchAll();
 
                             if (isset($data[0]['id_mesa'])) {
-
-                                $eliminar = $this->con->prepare("DELETE FROM entradas WHERE numMesa='$this->codigo'");
+                                $eliminar = $this->con->prepare("DELETE FROM entradas WHERE numMesa='". $objMesa->getIdMesa() . "'");
                                 $eliminar->execute();
+                                $new = $this->updateMesa($objMesa);
 
-
-                                $new = $this->con->prepare("UPDATE `mesas` SET `evento`= ?, `area`= ?, `precio`=?, `posiColumna`=?, `posiFila`= ? , cantPuesto= ? WHERE `id_mesa`= '$this->codigo' ");
-                                $new->bindValue(1, $this->evento);
-                                $new->bindValue(2, $this->nombArea);
-                                $new->bindValue(3, $this->precio);
-                                $new->bindValue(4, $this->posiColumna);
-                                $new->bindValue(5, $this->posiFila);
-                                $new->bindValue(6, $this->cantPuesto);
-                                $new->execute();
-                                $id = $this->codigo;
-                                $num_elementos = 0;
-                                $sw = true;
-
-                                while ($num_elementos < $this->cantPuesto) {
-
-                                    $this->registrarEntradas($id) or $sw = false;
-
-                                    $num_elementos = $num_elementos + 1;
-
+                                $objEntrada = new Entrada();
+                                $arrEntradas = [];
+                                for ($i=0; $i<$objMesa->getCantPuesto(); $i++){
+                                    $entrada = [
+                                        'numMesa' => $objMesa->getIdMesa(),
+                                        'status' => Entrada::ENTRADA_STATUS_DISPONIBLE
+                                    ];
+                                    $arrEntradas[] = $entrada;
                                 }
-
-                                $mensaje = array('resultado' => 'modificado correctamente.');
-                                echo json_encode($mensaje);
-                                die();
+                                $resp = $objEntrada->insertBatchEntradas($arrEntradas);
+                                if ($entradas[0]['entradas'] == $suma[0]['puestos']) {
+                                    $ocupar = $this->con->prepare("UPDATE `eventos` SET `status`='Ocupado' WHERE `nombre` = ? ");
+                                    $ocupar->bindValue(1, $this->evento);
+                                    $ocupar->execute();
+                                }
+                                return ['success'=>true, 'data'=>null, 'msj'=>''];
                             }
-                            if ($entradas[0]['entradas'] == $suma[0]['puestos']) {
-
-                                $ocupar = $this->con->prepare("UPDATE `eventos` SET `status`='Ocupado' WHERE `nombre` = ? ");
-                                $ocupar->bindValue(1, $this->evento);
-                                $ocupar->execute();
-                            }
-                        } else {
-                            $mensaje = ['resultado' => 'cantidad de entradas', 'cant' => $cal];
-                            echo json_encode($mensaje);
-                            die();
                         }
-
-
-                    } else {
-
-                        $new = $this->con->prepare("UPDATE `mesas` SET `evento`= ?, `area`= ?, `precio`=?, `posiColumna`=?, `posiFila`= ? , cantPuesto= ? WHERE `id_mesa`= '$this->codigo' ");
-                        $new->bindValue(1, $this->evento);
-                        $new->bindValue(2, $this->nombArea);
-                        $new->bindValue(3, $this->precio);
-                        $new->bindValue(4, $this->posiColumna);
-                        $new->bindValue(5, $this->posiFila);
-                        $new->bindValue(6, $this->cantPuesto);
-                        $new->execute();
-                        $mensaje = array('resultado' => 'modificado correctamente.');
-                        echo json_encode($mensaje);
-                        die();
-
-
+                        else
+                        {
+                            /*$mensaje = ['resultado' => 'cantidad de entradas', 'cant' => $cal];
+                            echo json_encode($mensaje);
+                            die();*/
+                            return ['success'=>false, 'data'=>null, 'msj'=>'La cantidad de Entradas especificada supera la disponibilidad.'];
+                        }
+                    } else
+                    {
+                        $new = $this->updateMesa($objMesa);
+                        return ['success'=>true, 'data'=>null, 'msj'=>''];
                     }
-
-
                 } else {
-                    $mensaje = array('resultado' => 'Error Posicion');
-                    echo json_encode($mensaje);
-                    die();
+                    return ['success'=>false, 'data'=>null, 'msj'=>'Error Posicion'];
                 }
-
+            }else{
+                return ['success'=>false, 'data'=>null, 'msj'=>'Estatus No Permitido'];
             }
-        } catch (exection $error) {
-            return array("Sistema", "¡Error Sistema!");
-
+        } catch (\Exception $error) {
+            return ['success'=>false, 'data'=>null, 'msj'=>'ModificarMesa: ' . $error->getMessage()];
         }
     }
 
     public function eliminarMesa($id)
     {
-
         $this->codigo = $id;
 
         try {
@@ -488,7 +421,7 @@ class mesasM extends BDConexion
     public function getMesasByStatus($status){
         try {
             $in  = str_repeat('?,', count($status) - 1) . '?';
-            $strSql = "SELECT m.*, a.nombArea, e.nombre as nombre_evento, e.entradas, e.fecha, e.hora, a.nombArea " .
+            $strSql = "SELECT m.*, a.nombArea, e.nombre as nombre_evento, e.entradas, e.fecha, e.hora, a.nombArea, e.status as status_evento " .
                 "FROM mesas m INNER JOIN eventos e ON m.evento=e.codigo  " .
                 "INNER JOIN area a ON m.area = a.cod_area " .
                 "WHERE m.status IN ($in) ORDER BY e.fecha ASC, e.hora ASC,m.id_mesa ASC";
@@ -569,9 +502,16 @@ class mesasM extends BDConexion
         }
     }
 
-    public function anularMesa($id_mesa){
+    public function anularMesa($id_mesa,$id_evento){
         try {
             $this->con->beginTransaction();
+
+            $strSql ="UPDATE evento SET status=?  WHERE codigo=?";
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, Evento::EVENTO_STATUS_DISPONIBLE);
+            $new->bindValue(2, $id_evento);
+            $new->execute();
+
             $strSql ="UPDATE mesas SET status=?  WHERE id_mesa=?";
             $new= $this->con->prepare($strSql);
             $new->bindValue(1, Mesa::MESA_STATUS_ANULADO);

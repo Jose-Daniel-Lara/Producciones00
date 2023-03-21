@@ -176,4 +176,4 @@ $carrusel->carruselEventos();
 <?php
 require_once("contenido/componentes/footer.php")
 ?>
-<script type="text/javascript" src="<?php echo URL;?>assets/js/reporteMesa.js"></script>
+<!--<script type="text/javascript" src="<?php /*echo URL;*/?>assets/js/reporteMesa.js"></script>-->

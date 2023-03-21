@@ -144,9 +144,23 @@ function registrarMesa($request)
 
 }
 
+function actualizarMesa($request){
+    $objMesa = new Mesa();
+    $objMesa->setIdMesa($request['mesa']);
+    $objMesa->setEvento($request['evento']);
+    $objMesa->setArea($request['area']);;
+    $objMesa->setPrecio($request['precio']);
+    $objMesa->setPosiColumna($request['posiColumna']);
+    $objMesa->setPosiFila($request['posiFila']);
+    $objMesa->setCantPuesto($request['puestos']);
+    $objMesa->setStatus($request['status']);
+
+    $resp = $objMesa->modificarMesa($objMesa);
+}
+
 function anularMesa($request){
     $mesa = new Mesa();
-    return $mesa->anularMesa($request['codigo']);
+    return $mesa->anularMesa($request['codigo'], $request['evento']);
 }
 
 function restaurarMesa($request){

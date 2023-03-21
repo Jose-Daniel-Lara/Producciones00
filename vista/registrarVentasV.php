@@ -38,8 +38,8 @@ $carrusel->carruselVentas();
                     </thead>
                     <tbody">
                     <?php
-                    if(isset( $dataVentas)) {
-                        foreach ($dataVentas as $data){
+                    if(isset($dataVentas)) {
+                        foreach ($dataVentas['data'] as $data){
                             ?>
                             <tr class="fila" id="V-<?php echo $data->numeroVenta ?>">
                                 <td class="text-left"><?php echo $data->fecha ?></td>
@@ -101,7 +101,7 @@ $carrusel->carruselVentas();
                                 <option value="" class="opcion" >Seleccionar Método</option>
                                 <?php
                                 if(isset( $metodoPago)) {
-                                    foreach ($metodoPago as $data){
+                                    foreach ($metodoPago['data'] as $data){
                                         ?>
                                         <option value="<?php echo $data->id_metodo?>"  class="opcion"><?php echo $data->metodo?></option>
                                         <?php
@@ -199,7 +199,7 @@ $carrusel->carruselVentas();
                                     </td>
 
                                     <td width="15%" class="precio">
-                                        <input style="text-align: right" type="number" class="form-control campo mt-3 value-precio" value="" disabled="disabled">
+                                        <input style="text-align: right" step="0.01" type="number" class="form-control campo mt-3 value-precio" value="">
                                         <p id="errorPago" class="text-center l "></p>
                                     </td>
 

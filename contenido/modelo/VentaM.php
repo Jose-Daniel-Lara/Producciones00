@@ -4,7 +4,7 @@ use contenido\configuracion\conexion\BDConexion as BDConexion;
 
 class VentaM extends BDConexion{
     const VENTA_ESTATUS_DISPONIBLE = 'Disponible';
-    const VENTA_ESTATUS_ANULADO = 'Anulado';
+    const VENTA_ESTATUS = 'Anulado';
 
     private $numeroVenta;
     private $cedula;
@@ -16,9 +16,6 @@ class VentaM extends BDConexion{
     private $status;
     private $detalleVenta;
 
-    /**
-     * @param $numeroVenta
-     */
     public function __construct()
     {
         parent::__construct();
@@ -45,6 +42,41 @@ class VentaM extends BDConexion{
         $this->hora = $hora;
         $this->montoTotal = $montoTotal;
         $this->status = $status;
+    }
+
+    public function consultarVentas(){
+        try {
+            $strSql = "SELECT v.*,c.nombre,c.apellido,mp.metodo, " .
+                "(SELECT SUM(dv.descuento) FROM detalleventa dv WHERE dv.idVenta=v.numeroVenta and dv.status='Disponible') as descuento " .
+                "FROM `ventas` v " .
+                "INNER JOIN `clientes` c ON v.cedula=c.cedula " .
+                "INNER JOIN metodopago mp ON v.metodoPago=mp.id_metodo " .
+                " ORDER BY numeroVenta DESC";
+            $new = $this->con->prepare($strSql);
+            $new->execute();
+            $data = $new->fetchAll(\PDO::FETCH_OBJ);
+
+            return ['success'=>true, 'data'=>$data, 'msj'=>''];
+        }catch(\Exception $error){
+            return ['success'=>false, 'data'=>null, 'msj'=>'ConsultarVentas: ' . $error->getMessage()];
+        }
+    }
+
+    public function consultarMetodo(){
+
+        try {
+            $new = $this->con->prepare("SELECT * FROM `metodopago` WHERE `status`='Disponible'");
+            $new->execute();
+            $data = $new->fetchAll(\PDO::FETCH_OBJ);
+
+            return ['success'=>true, 'data'=>$data, 'msj'=>''];
+        }
+
+        catch(\Exception $error){
+            return ['success'=>false, 'data'=>null, 'msj'=>'ConsultarMetodo: ' . $error->getMessage()];
+
+        }
+
     }
 
     public function insertVenta(VentaM $venta){

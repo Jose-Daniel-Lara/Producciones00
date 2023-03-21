@@ -60,6 +60,17 @@ if (IS_AJAX){
 }
 
 function registrarEvento($request,$files){
+    date_default_timezone_set("america/caracas");
+    $hoy = date("Y/m/d");
+    $dias = (strtotime($hoy) - strtotime($request['fecha'])) / 86400;
+    $dias = abs($dias);
+    $dias = floor($dias);
+
+    if (strtotime($hoy) > strtotime($request['fecha'])) {
+        return ['success'=>false, 'data'=>null, 'msj'=>'La fecha [' . $request['fecha'] . '] ya caducó'];
+    }elseif ($dias < 30){
+        return ['success'=>false, 'data'=>null, 'msj'=>'No se puede registrar un evento antes de 30 días'];
+    }
     $evento = new Evento();
     $evento->setCodigo($request['codigo']==0 ? rand(1000,900000) : $request['codigo']);
     $evento->setNombre($request['evento']);

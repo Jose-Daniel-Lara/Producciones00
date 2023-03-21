@@ -184,8 +184,8 @@ $(document).ready(function(e){
 							location.href="?url=eventos";
 						})
 					}else{
-						swal.fire('Upsss...', '¡Algo salió mal al grabar!', 'error');
-						location.href="?url=eventos";
+						swal.fire('Upsss...', resp.msj, 'error');
+						//location.href="?url=eventos";
 					}
 				})
 			return false;

@@ -1,3 +1,323 @@
+$(document).ready(function(e){
+    var modalCrud = new bootstrap.Modal(document.getElementById('modalCrudMesa'));
+
+    $("#selEvento").select2({
+        theme:'bootstrap-5',
+        dropdownParent:$('#modalCrudMesa .modal-content'),
+        selectionCssClass:"form-select",
+        dropdownCssClass:"select",
+        searchCssClass:"buscar",
+        width:'100%',
+        placeholder: 'Seleccione Evento',
+        minimumInputLength: 1,
+        minimumResultsForSearch: 20,
+        language: "es",
+        ajax: {
+            url: "?url=mesas",
+            type: "post",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                var query = {
+                    search: params.term,
+                    op: 'eventoSelectList'
+                }
+                // Query parameters will be ?search=[term]&op=eventoSelectList
+                return query;
+            },
+            processResults: function (response) {
+                return {
+                    results: response.results
+                };
+            },
+            cache: true
+        }
+    });
+
+    $(".btn-crud-mesa").on("click", function(){
+        let mesa_id = $(this).data('mesa');
+        let op = parseInt(mesa_id) > 0 ? 'updateMesa' : 'addMesa';
+        console.log('Mesa Id:  ' + mesa_id);
+        console.log('op: ' + op );
+
+        $('#hid_op').val(op);
+        $('#hid_mesa_id').val(mesa_id);
+
+        if (parseInt(mesa_id) >0){
+            if ($(this).data('status') == M_STATUS_OCUPADO){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Operación No Permitida',
+                    text: 'La mesa está ' + M_STATUS_OCUPADO,
+                })
+                return false;
+            }
+
+            if ($(this).data('status_evento') == 'Ocupado'){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Operación No Permitida',
+                    text: 'El Evento asociado a la Mesa está Ocupado.',
+                })
+                return false;
+            }
+
+            var data = {
+                id: $(this).data('evento'),
+                text: $(this).data('nombre_evento')
+            };
+
+            var newOption = new Option(data.text, data.id, false, false);
+            $('#selEvento').append(newOption).trigger('change');
+
+            $("#selArea").val($(this).data('area'));
+            $("#precio").empty().val($(this).data('precio'));
+            $("#posiColumna").empty().val($(this).data('columna'));
+            $("#posiFila").empty().val($(this).data('fila'));
+            $("#cantPuesto").empty().val($(this).data('puestos'));
+            $("#estatus_mesa").empty().val($(this).data('status'));
+        }else{
+            $("#selArea").val("");
+            $("#precio").empty();
+            $("#posiColumna").empty();
+            $("#posiFila").empty();
+            $("#cantPuesto").empty();
+            $("#estatus_mesa").val(M_STATUS_DISPONIBLE);
+        }
+        modalCrud.show();
+    });
+
+    $(".btn-delete-mesa").on("click", function (){
+        let codigo = $(this).data('mesa');
+        let status = $(this).data('status');
+        if (status===M_STATUS_OCUPADO){
+            Swal.fire({
+                icon: 'error',
+                title: 'Operación No Permitida',
+                text: 'La Mesa está en estatus ' + M_STATUS_OCUPADO,
+            })
+        }else{
+            swal.fire({
+                title: '¿Seguro de Anular este Mesa?',
+                text: "Continúe para confirmar la Anulación...",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si, Anular!',
+            }).then((result) => {
+                if (result.value){
+                    $.ajax({
+                        url: '?url=mesas',
+                        type: 'POST',
+                        data: {
+                            op: 'anularMesa',
+                            codigo: codigo
+                        },
+                        dataType: 'json'
+                    })
+                        .done(function(response){
+                            if (response.success){
+                                swal.fire('Anulada!', 'Mesa Anulada', 'success');
+                            }else{
+                                swal.fire('Anulada!', response.msj, 'success');
+                            }
+                            location.href='?url=mesas';
+                        })
+                        .fail(function(){
+                            swal.fire('Upsss...', '¡Algo salió mal al anular!', 'error');
+                        });
+                } // fin de if (result.value)
+            })
+        }//fin del else
+    })
+
+    $(".restaurar-mesa").on("click", function (){
+        let codigo = $(this).data('mesa');
+
+        swal.fire({
+            title: '¿Seguro de Restaurar esta Mesa?',
+            text: "Continúe para confirmar la Restauración...",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, Restaurar!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: '?url=mesas',
+                    type: 'POST',
+                    data: {
+                        op: 'restaurarMesa',
+                        codigo: codigo
+                    },
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            swal.fire('Restaurada!', 'Mesa Restaurada', 'success');
+                        } else {
+                            swal.fire('Upsss...', response.msj, 'error');
+                        }
+                        location.href = '?url=mesas';
+                    })
+                    .fail(function () {
+                        swal.fire('Upsss...', '¡Algo salió mal al anular!', 'error');
+                    });
+            } // fin de if (result.value)
+        })
+    })
+
+    $('#envioDataMesa').on('click', function () {
+        if (validar()){
+            let msjOperacion = $("#hid_op").val() == 'addMesa' ? 'Registrada' : 'Actualizada';
+            let formData = {
+                op:$("#hid_op").val(),
+                mesa: $("#hid_mesa_id").val(),
+                status: $('#estatus_mesa').val(),
+                evento: $("#selEvento").val().trim(),
+                area: $("#selArea").val(),
+                puestos: $("#cantPuesto").val().trim(),
+                precio: $("#precio").val().trim(),
+                posiColumna: $("#posiColumna").val().trim(),
+                posiFila: $("#posiFila").val().trim()
+            }
+            //console.log(formData);
+            $.ajax({
+                url: '?url=mesas',
+                type: 'POST',
+                data: formData,
+                dataType: 'json'
+            })
+                .done(function(response) {
+                    console.log(response);
+                    //let resp = JSON.parse(response);
+                    if (response.success){
+                        Swal.fire({
+                            title:'<h3 style="color:#040855!important;"><b>' + msjOperacion + '</b></h3>',
+                            html:'<p style="color:#bbb!important;">Mesa ' + msjOperacion + ' Exitosamente!</p> <br> <div class="modal-footer"> </div>',
+                            showConfirmButton:false,
+                            timer:2500,
+                            timerProgressBar:true,
+                            imageUrl:'assets/img/check.png',
+                            imageWidth:'180px',
+                            imageHeight:'140px',
+                            imageAlt:'registrado'
+                        }).then(()=>{
+                            //location.href="?url=mesas";
+                        })
+                    }else{
+                        console.log(response);
+                        swal.fire('Upsss...', '¡Algo salió mal al grabar!', 'error');
+                        //location.href="?url=mesas";
+                    }
+                })
+            return false;
+        }
+    })
+})
+
+function validar(){
+    let ok = true;
+    let numVal = /^[0-9]+$/;
+
+    if ($("#selEvento").val() == null || $("#selEvento").val().trim().length === 0) {
+        $("#errorSelEvento").html('<i class="bi bi-exclamation-triangle-fill"></i>Seleccione el Evento.');
+        ok = false;
+    }else{
+        $("#errorSelEvento").html("");
+    }
+
+    if ($("#selArea").val() == null || $("#selArea").val().trim().length === 0) {
+        $("#errorSelArea").html('<i class="bi bi-exclamation-triangle-fill"></i>Seleccione Area.');
+        ok = false;
+    }else{
+        $("#errorSelArea").html("");
+    }
+
+    let cantPuestos = $("#cantPuesto").val().trim();
+    if ($("#cantPuesto").val().trim().length === 0){
+        $("#errorCantPuesto").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico correcto');
+        ok = false;
+    }else if (!cantPuestos.match(numVal)){
+        $("#errorCantPuesto").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico.');
+        ok = false;
+    }else if (parseInt(cantPuestos) <= 0 ){
+        $("#errorCantPuesto").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico mayor a 0.');
+        ok = false;
+    }else{
+        $("#errorCantPuesto").html("");
+    }
+
+    if($("#precio").val().trim().length === 0){
+        $("#errorPrecio").html('<i class="bi bi-exclamation-triangle-fill" ></i> Ingrese el Precio.');
+        ok = false;
+    }else if(!esNumero($("#precio").val().trim())){
+        $("#errorPrecio").html('<i class="bi bi-exclamation-triangle-fill" ></i> Ingrese un valor numérico correcto.');
+        ok = false;
+    }else{
+        $("#errorPrecio").html("");
+    }
+
+    let posiCol = $("#posiColumna").val().trim();
+    if (posiCol.length === 0){
+        $("#errorPosiColumna").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico correcto');
+        ok = false;
+    }else if (!posiCol.match(numVal)){
+        $("#errorPosiColumna").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico.');
+        ok = false;
+    }else if (parseInt(posiCol) <= 0 ){
+        $("#errorPosiColumna").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico mayor a 0.');
+        ok = false;
+    }else{
+        $("#errorPosiColumna").html("");
+    }
+
+    let posiFila = $("#posiFila").val().trim();
+    if (posiFila.length === 0){
+        $("#errorPosiFila").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico correcto');
+        ok = false;
+    }else if (!posiFila.match(numVal)){
+        $("#errorPosiFila").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico.');
+        ok = false;
+    }else if (parseInt(posiFila) <= 0 ){
+        $("#errorPosiFila").html('<i class="bi bi-exclamation-triangle-fill" ></i>Ingrese un valor numérico mayor a 0.');
+        ok = false;
+    }else{
+        $("#errorPosiFila").html("");
+    }
+
+    return ok;
+}
+
+function esNumero (dato){
+    /*Definición de los valores aceptados*/
+    var valoresAceptados = /^[0-9]+$/;
+    if (dato.indexOf(".") === -1 ){
+        if (dato.match(valoresAceptados)){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        //dividir la expresión por el punto en un array
+        var particion = dato.split(".");
+        //evaluamos la primera parte de la división (parte entera)
+        if (particion[0].match(valoresAceptados) || particion[0]==""){
+            if (particion[1].match(valoresAceptados)){
+                return true;
+            }else {
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+}
+
+/*
+
 //------------------------------- FUNCION MOSTRAR AJAX ------------------------------//
 
 let tabla ;
@@ -553,3 +873,4 @@ document.getElementById("modifica").addEventListener("click", e => {
   })
 
 
+*/
