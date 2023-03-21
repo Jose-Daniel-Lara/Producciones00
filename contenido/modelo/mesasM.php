@@ -163,14 +163,14 @@ class mesasM extends BDConexion
     public function consultarMesa()
     {
         try {
-            $new = $this->con->prepare("SELECT * FROM mesas m  INNER JOIN eventos e ON m.evento=e.nombre WHERE m.status= 'Disponible'");
+            $new = $this->con->prepare("SELECT * FROM mesas m  INNER JOIN eventos e ON m.evento=e.nombre WHERE m.status= '" . self::MESA_STATUS_DISPONIBLE . "'");
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
-            echo json_encode($data);
-            die();
-        } catch (exection $error) {
-            return $error;
-
+            //echo json_encode($data);
+            //die();
+            return ['success'=>true, 'data'=>$data, 'msj'=>''];
+        } catch (\Exception $error) {
+            return ['success'=>false, 'data'=>null, 'msj'=>'consultarMesa: ' .$error->getMessage()];
         }
     }
 
@@ -426,7 +426,13 @@ class mesasM extends BDConexion
     {
         $this->codigo = $reporte;
         try {
-            $new = $this->con->prepare("SELECT * FROM eventos e INNER JOIN mesas m  ON e.nombre=m.evento WHERE e.nombre= '$this->codigo'");
+            $strSql = "SELECT e.nombre as nombre_evento, m.*," .
+                    "a.nombArea " .
+                    "FROM eventos e INNER JOIN mesas m  ON e.codigo=m.evento " .
+                    "INNER JOIN area a ON m.area=a.cod_area " .
+                    "WHERE e.codigo=? ORDER BY m.posiFila ASC, m.posiColumna ASC";
+            $new = $this->con->prepare($strSql);
+            $new->bindValue(1, $reporte);
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
             return $data;
@@ -648,6 +654,42 @@ class mesasM extends BDConexion
         $new->bindValue(3, $posiFila);
         $new->execute();
         return $new->fetchColumn();
+    }
+
+    public function getCantMesasByEvento($evento_id){
+        try{
+            $strSql = "SELECT e.nombre as nombre_evento, a.nombArea,
+                    COUNT(m.id_mesa) as cant_mesas
+                    FROM mesas m
+                    INNER JOIN eventos e ON e.codigo=m.evento    
+                    INNER JOIN area a ON a.cod_area=m.area
+                    WHERE m.evento=?
+                    GROUP BY e.nombre,a.nombArea
+                    ORDER BY a.nombArea ASC";
+            $new = $this->con->prepare($strSql);
+            $new->bindValue(1, $evento_id);
+            $new->execute();
+            $data = $new->fetchAll(\PDO::FETCH_OBJ);
+            $series = array();
+            $labels = array();
+            foreach($data as $d){
+                $series[] = array(
+                    "value" => $d->cant_mesas,
+                    "name" => $d->nombArea
+                );
+                $labels[] = $d->nombArea;
+            }
+            return ['success'=>true,
+                'data'=>[
+                    'series'=>json_encode($series),
+                    'labels'=>json_encode($labels),
+                ]
+                ,
+                'msj'=> ''
+            ];
+        }catch (\Exception $error){
+            return ['success'=>false, 'data'=>null, 'msj'=>$error->getMessage()];
+        }
     }
 
     /**

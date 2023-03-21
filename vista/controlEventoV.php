@@ -141,7 +141,7 @@ $carrusel->carruselEventos();
                             left: 'center'
                         },
                         series: [{
-                            name: 'Evento',
+                            name: 'Evento: Entradas x Mesa',
                             type: 'pie',
                             radius: ['40%', '70%'],
                             avoidLabelOverlap: false,

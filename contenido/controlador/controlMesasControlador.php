@@ -19,9 +19,11 @@ $objeto = new mesasM();
 //////////////---------Control--------///////////////
 
     if (isset($_POST['reporte'])) {
-
-     $control= $objeto->controlMesa($_POST['reporte']);
-
+        $evento_id = $_POST['reporte'];
+        if ($evento_id !== '--'){
+            $control= $objeto->controlMesa($evento_id);
+            $grafico = $objeto->getCantMesasByEvento($evento_id);
+        }
     }
 
 //////////////////////////////////////////////////////
