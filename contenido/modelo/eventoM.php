@@ -181,10 +181,10 @@ class eventoM extends BDConexion
             $new = $this->con->prepare("SELECT * FROM `eventos`  WHERE status!='Anulado'");
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
-            echo json_encode($data);
-            die();
-        } catch (exection $error) {
-            return $error;
+            return ['success'=>true, 'data'=>$data, 'msj'=>''];
+            //echo json_encode($data);
+        } catch (\Exception $error) {
+            return ['success'=>false, 'data'=>null, 'msj'=>'consultarEvento: ' . $error->getMessage()];
 
         }
     }
@@ -596,6 +596,51 @@ class eventoM extends BDConexion
             return  ['success'=>true, 'data'=>$response, 'msj'=>''];
 
         }catch(\Exception $error){
+            return ['success'=>false, 'data'=>null, 'msj'=>$error->getMessage()];
+        }
+    }
+
+    public function getCantEntradasVendidasByEvento($evento_id){
+        try{
+            $strSql = "SELECT e.nombre as evento,
+                    CONCAT('F',m.posiFila,' - ','C',m.posiColumna) as mesa,
+                    m.cantPuesto as capacidad_mesa,
+                    SUM(dv.cantEntradas) as cant_entradas,
+                    ROUND((SUM(dv.cantEntradas)/m.cantPuesto)*100,2) as porc_vendido
+                    FROM ventas v INNER JOIN detalleventa dv ON v.numeroVenta = dv.idVenta 
+                    INNER JOIN eventos e ON e.codigo = dv.evento 
+                    INNER JOIN mesas m ON m.id_mesa = dv.id_mesa 
+                    WHERE e.codigo=? AND v.status = 'Disponible' AND dv.status = 'Disponible'
+                    GROUP BY e.nombre,CONCAT('F',m.posiFila,' - ','C',m.posiColumna),m.cantPuesto
+                    ORDER BY CONCAT('F',m.posiFila,' - ','C',m.posiColumna)";
+            $new = $this->con->prepare($strSql);
+            $new->bindValue(1, $evento_id);
+            $new->execute();
+            $data = $new->fetchAll(\PDO::FETCH_OBJ);
+            $series = array();
+            $labels = array();
+            $total_puestos = 0;
+            $cant_entradas_vendidas=0;
+            foreach($data as $d){
+                $total_puestos += $d->capacidad_mesa;
+                $cant_entradas_vendidas += $d->cant_entradas;
+                $series[] = array(
+                    "value" => $d->cant_entradas,
+                    "name" => $d->mesa
+                );
+                $labels[] = $d->mesa;
+            }
+            return ['success'=>true,
+                'data'=>[
+                    'series'=>json_encode($series),
+                    'labels'=>json_encode($labels),
+                    'capacidad_total' =>$total_puestos,
+                    'vendidas' => $cant_entradas_vendidas
+                ]
+                ,
+                'msj'=> ''
+            ];
+        }catch (\Exception $error){
             return ['success'=>false, 'data'=>null, 'msj'=>$error->getMessage()];
         }
     }
