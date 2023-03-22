@@ -9,7 +9,7 @@ if (isset($_SESSION['idusuario'])) {
 }
 
 use contenido\componentes\carrusel as carrusel;
-use contenido\modelo\Entrada;
+use contenido\modelo\entradaM as Entrada;
 use contenido\modelo\eventoM as Evento;
 use contenido\modelo\mesasM as Mesa;
 use contenido\modelo\areaM as Area;
@@ -156,6 +156,7 @@ function actualizarMesa($request){
     $objMesa->setStatus($request['status']);
 
     $resp = $objMesa->modificarMesa($objMesa);
+    return $resp;
 }
 
 function anularMesa($request){

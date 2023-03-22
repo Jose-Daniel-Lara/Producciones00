@@ -5,6 +5,7 @@ namespace contenido\modelo;
 use contenido\configuracion\conexion\BDConexion as BDConexion;
 use contenido\modelo\mesasM as Mesa;
 use contenido\modelo\eventoM as Evento;
+use contenido\modelo\entradaM as Entrada;
 
 class mesasM extends BDConexion
 {
@@ -206,7 +207,7 @@ class mesasM extends BDConexion
                 $nombre = $mesa->fetchAll();
 
                 if (!isset($nombre[0]['posiColumna']) && !isset($nombre[0]['posiFila'])) {
-                    $info = $this->con->prepare("SELECT  cantPuesto FROM mesas WHERE `status` = '" . self::MESA_STATUS_DISPONIBLE . "' and id_mesa=? ");
+                    $info = $this->con->prepare("SELECT cantPuesto FROM mesas WHERE `status` = '" . self::MESA_STATUS_DISPONIBLE . "' and id_mesa=? ");
                     $info->bindValue(1, $objMesa->getIdMesa());
                     $info->execute();
                     $xx = $info->fetchAll();
@@ -246,7 +247,7 @@ class mesasM extends BDConexion
                             return ['success'=>true, 'data'=>null, 'msj'=>''];
                         }
                     }
-                    if ($objMesa->getCantPuesto() > $xx[0]['cantPuesto']) {
+                    elseif ($objMesa->getCantPuesto() > $xx[0]['cantPuesto']) {
                         $puestos = $this->con->prepare("SELECT SUM(cantPuesto) as puestos FROM mesas WHERE `status` = '" . Mesa::MESA_STATUS_DISPONIBLE . "' and evento = ? and id_mesa!=?");
                         $puestos->bindValue(1, $objMesa->getEvento());
                         $puestos->bindValue(2, $objMesa->getIdMesa());
@@ -261,7 +262,8 @@ class mesasM extends BDConexion
                         $cal = ($entradas[0]['entradas']) - ($suma[0]['puestos']);
 
                         if ($objMesa->getCantPuesto() <= $cal) {
-                            $consultar = $this->con->prepare("SELECT * FROM mesas m INNER JOIN entradas e ON m.id_mesa=e.numMesa WHERE m.id_mesa='". $objMesa->getIdMesa() . "'");
+                            $strSql = "SELECT * FROM mesas m INNER JOIN entradas e ON m.id_mesa=e.numMesa WHERE m.id_mesa='". $objMesa->getIdMesa() . "'";
+                            $consultar = $this->con->prepare($strSql);
                             $consultar->execute();
                             $data = $consultar->fetchAll();
 
@@ -286,6 +288,8 @@ class mesasM extends BDConexion
                                     $ocupar->execute();
                                 }
                                 return ['success'=>true, 'data'=>null, 'msj'=>''];
+                            }else{
+                                return ['success'=>false, 'data'=>null, 'msj'=>'Error al buscar Id de Mesa.'];
                             }
                         }
                         else
@@ -306,6 +310,7 @@ class mesasM extends BDConexion
             }else{
                 return ['success'=>false, 'data'=>null, 'msj'=>'Estatus No Permitido'];
             }
+
         } catch (\Exception $error) {
             return ['success'=>false, 'data'=>null, 'msj'=>'ModificarMesa: ' . $error->getMessage()];
         }

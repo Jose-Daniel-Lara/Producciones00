@@ -3,7 +3,7 @@ namespace contenido\modelo;
 
 use contenido\configuracion\conexion\BDConexion;
 
-class Entrada extends BDConexion
+class entradaM extends BDConexion
 {
     const ENTRADA_STATUS_DISPONIBLE = 'Disponible';
     const ENTRADA_STATUS_ANULADO = 'Anulada';

@@ -120,7 +120,7 @@ $(document).ready(function(e){
                             if (response.success){
                                 swal.fire('Anulada!', 'Mesa Anulada', 'success');
                             }else{
-                                swal.fire('Anulada!', response.msj, 'success');
+                                swal.fire('Anulación', response.msj, 'success');
                             }
                             location.href='?url=mesas';
                         })
@@ -205,11 +205,10 @@ $(document).ready(function(e){
                             imageHeight:'140px',
                             imageAlt:'registrado'
                         }).then(()=>{
-                            //location.href="?url=mesas";
+                            location.href="?url=mesas";
                         })
                     }else{
-                        console.log(response);
-                        swal.fire('Upsss...', '¡Algo salió mal al grabar!', 'error');
+                        swal.fire('Upsss...', response.msj, 'error');
                         //location.href="?url=mesas";
                     }
                 })
