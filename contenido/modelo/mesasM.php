@@ -383,7 +383,7 @@ class mesasM extends BDConexion
     public function mesa()
     {
         try {
-            $new = $this->con->prepare("SELECT * FROM mesas m  INNER JOIN eventos e ON m.evento=e.nombre WHERE m.status= 'Disponible'");
+            $new = $this->con->prepare("SELECT * FROM mesas m  INNER JOIN eventos e ON m.evento=e.codigo WHERE m.status= 'Disponible'");
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
             return $data;
@@ -511,7 +511,7 @@ class mesasM extends BDConexion
         try {
             $this->con->beginTransaction();
 
-            $strSql ="UPDATE evento SET status=?  WHERE codigo=?";
+            $strSql ="UPDATE eventos SET status=?  WHERE codigo=?";
             $new= $this->con->prepare($strSql);
             $new->bindValue(1, Evento::EVENTO_STATUS_DISPONIBLE);
             $new->bindValue(2, $id_evento);

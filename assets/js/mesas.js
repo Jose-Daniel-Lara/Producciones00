@@ -90,6 +90,7 @@ $(document).ready(function(e){
     $(".btn-delete-mesa").on("click", function (){
         let codigo = $(this).data('mesa');
         let status = $(this).data('status');
+        let evento = $(this).data('evento');
         if (status===M_STATUS_OCUPADO){
             Swal.fire({
                 icon: 'error',
@@ -112,17 +113,20 @@ $(document).ready(function(e){
                         type: 'POST',
                         data: {
                             op: 'anularMesa',
-                            codigo: codigo
+                            codigo: codigo,
+                            evento: evento
                         },
                         dataType: 'json'
                     })
                         .done(function(response){
                             if (response.success){
-                                swal.fire('Anulada!', 'Mesa Anulada', 'success');
+                                swal.fire('Anulada!', 'Mesa Anulada', 'success')
+                                    .then((result)=>{location.href='?url=mesas'});
                             }else{
-                                swal.fire('Anulación', response.msj, 'success');
+                                swal.fire('Anulación', response.msj, 'success')
+                                    .then((result)=>{location.href='?url=mesas'});
                             }
-                            location.href='?url=mesas';
+                            //location.href='?url=mesas';
                         })
                         .fail(function(){
                             swal.fire('Upsss...', '¡Algo salió mal al anular!', 'error');

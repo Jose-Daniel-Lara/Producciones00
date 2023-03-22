@@ -25,7 +25,7 @@ $carrusel->carruselEventos();
 
                 <button class=" btn12 fw-bold col-2 col-md-3 col-lg-2 btn-crud-mesa" type="button" data-bs-toggle="modal" data-mesa="0" data-bs-target="#modalCrudMesa" style="box-shadow:none!important;" data-bs-toggle="tooltip" data-bs-placement="top" title="Registrar Mesa" ><i class="bx bxs-edit " style="font-size: 23px!important;"  ></i></button>
 
-                <a href="?url=reporteMesas" class="btn11 col-2 fw-bold col-md-3 col-lg-2 text-center pt-1 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de Mesas"><i class="bi bi-upload " style="font-size: 23px!important;"  ></i></a>
+                <a href="?url=reporteMesas" target="_blank" class="btn11 col-2 fw-bold col-md-3 col-lg-2 text-center pt-1 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de Mesas"><i class="bi bi-upload " style="font-size: 23px!important;"  ></i></a>
 
                 <a class=" fw-bold  col-2 col-md-3 col-lg-2 text-center mt-1 " type="button" data-bs-toggle="modal" data-bs-target="#papeleraME" data-bs-toggle="tooltip" data-bs-placement="top" title="Papelera Mesa"><i class="bi bi-trash icon999 " style="color: #fff; font-size: 30px;" ></i></a>
 
@@ -75,7 +75,8 @@ $carrusel->carruselEventos();
 
                                     <button class="btn btn11 fw-bold  mb-1 col-6 col-md-5 btn-delete-mesa" type="button" data-bs-toggle="modal"
                                             data-bs-target="" data-bs-toggle="tooltip" data-bs-placement="top" title="Anular"
-                                            data-mesa="<?php echo $data->id_mesa ?>" data-status="<?php echo $data->status ?>">
+                                            data-mesa="<?php echo $data->id_mesa ?>" data-status="<?php echo $data->status ?>"
+                                            data-evento="<?php echo $data->evento ?>">
                                         <i class="bi bi-trash-fill "></i>
                                     </button>
                                 </th>
