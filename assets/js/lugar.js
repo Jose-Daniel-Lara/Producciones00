@@ -47,8 +47,6 @@ document.getElementById("envio").addEventListener("click", e => {
     var enviar=false;
     errorLugar.innerHTML=""
     errorDireccion.innerHTML=""
-	
-	
 
 	if(lugar.value.length < 1){
         e.preventDefault();
@@ -105,7 +103,7 @@ function registrarLugar(){
 		url:"",
 		method:"post",
 		dataType:"json",
-		data:{ registrarL:"registrarL", lugar, direccion},
+		data:{ registrarL:"registrarL", lugar:lugar, direccion:direccion},
 		success(data){
 
 		if (data.resultado === "lugar."){
