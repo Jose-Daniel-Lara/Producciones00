@@ -84,11 +84,9 @@ class clientM extends BDConexion
             $new = $this->con->prepare("SELECT * FROM `clientes` WHERE `status`='Disponible'");
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
-            echo json_encode($data);
-            die();
-        } catch (exection $error) {
-            return $error;
-
+            return ['success'=>true, 'data'=>$data,'msj'=>''];
+        } catch (\Exception $error) {
+            return ['success'=>false, 'data'=>null,'msj'=>'consultarClientes: ' . $error->getMessage()];
         }
     }
 
@@ -175,11 +173,9 @@ class clientM extends BDConexion
             $new = $this->con->prepare("SELECT * FROM `clientes` WHERE  `status` ='Anulado'");
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
-            echo json_encode($data);
-            die();
-        } catch (exection $error) {
-            return $error;
-
+            return ['success'=>true, 'data'=>$data,'msj'=>''];
+        } catch (\Exception $error) {
+            return ['success'=>false, 'data'=>null,'msj'=>'papeleraClientes: ' . $error->getMessage()];
         }
     }
 
