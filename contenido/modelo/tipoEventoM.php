@@ -93,7 +93,7 @@ class tipoEventoM extends BDConexion
         try {
 
             $new = $this->con->prepare("SELECT * FROM `tipoevento`  WHERE  cod_tipo = ? ");
-            $new->bindValue(1, $this->id);
+            $new->bindValue(1, $id);
             $new->execute();
             $data = $new->fetchAll();
             echo json_encode($data);
@@ -140,7 +140,7 @@ class tipoEventoM extends BDConexion
         $this->codigo = $id;
 
         try {
-            $new = $this->con->prepare("UPDATE `tipoEvento` SET `status` = 'Anulado' WHERE `cod_tipo`= '$this->codigo'");
+            $new = $this->con->prepare("UPDATE `tipoevento` SET `status` = 'Anulado' WHERE `cod_tipo`= '$this->codigo'");
             $new->execute();
             $mensaje = ['resultado' => 'Eliminado correctamente.'];
             echo json_encode($mensaje);

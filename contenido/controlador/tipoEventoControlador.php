@@ -25,7 +25,7 @@ if (isset($_SESSION['idusuario'])) {
 
   if (isset($_POST['registrarT']) && isset($_POST['tipo'])) {
 
-      $objeto->getTipo($_POST['tipo']);
+      $objeto->getTipoEvento($_POST['tipo']);
 
   } 
 
