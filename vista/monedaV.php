@@ -111,7 +111,7 @@
                  <div class="col-12">
                     <label  class="form-label"><i class="ri-sound-module-fill icon"style="color: #c79b2d!important;"></i>Al cambio</label>
                    
-                  <input type="number" class="form-control" placeholder="Ingrese su valor en Bs: 0,00" name="cambio" id="bs">
+                  <input type="number" min="1.00" step="0.01" class="form-control" placeholder="Ingrese su valor en Bs: 0.00" name="cambio" id="bs">
                    <p id="errorBs" class=" text-center l"></p>
                 </div>
 
@@ -170,7 +170,7 @@
                  <div class="col-12">
                     <label  class="form-label"><i class="ri-sound-module-fill icon"style="color: #c79b2d!important;"></i>Al cambio</label>
                    
-                  <input type="number" class="form-control" placeholder="Ingrese su valor en Bs : 0,00"  id="cambio00">
+                  <input type="number" min="1.00" step="0.01" class="form-control" placeholder="Ingrese su valor en Bs : 0.00"  id="cambio00">
                    <p id="errorBs00"   class=" text-center l"></p>
                 </div>
 

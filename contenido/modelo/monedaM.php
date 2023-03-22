@@ -191,7 +191,7 @@ class monedaM extends BDConexion{
               $muestra->execute();
               $nombre2 = $muestra->fetchAll();
 
-              if ($nombre[0]['moneda'] == $nombre2[0]['moneda'] ) {
+              if (isset($nombre2[0]['moneda']) &&  ($nombre[0]['moneda'] == $nombre2[0]['moneda']) ) {
                   $mensaje = ['resultado' => 'error'];
                   echo json_encode($mensaje);
                   die();

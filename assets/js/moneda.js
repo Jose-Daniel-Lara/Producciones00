@@ -31,9 +31,6 @@ mostrarTabla();
 		})
 	}
 
-
-
-
 /////__________--Validacion de Registrar--___________//////
 
 var moneda=document.getElementById("moneda");
@@ -47,7 +44,7 @@ document.getElementById("envio").addEventListener("click", e => {
 	var error1=""
 	var error2=""
     var enviar=false;
-    var valorExp= /^\d{1,10}\,\d{2}$/;
+    var valorExp= /^\d{1,10}\.\d{2}$/;
     errorMoneda.innerHTML=""
     errorBs.innerHTML=""
 	
@@ -142,7 +139,7 @@ document.getElementById("modificar").addEventListener("click", e => {
 	var error1=""
 	var error2=""
     var enviar=false;
-    var valorExp=  /^\d{1,10}\,\d{2}$/;
+    var valorExp=  /^\d{1,10}\.\d{2}$/;
     errorMoneda00.innerHTML=""
     errorBs00.innerHTML=""
 	
