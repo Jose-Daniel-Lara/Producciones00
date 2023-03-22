@@ -185,7 +185,7 @@ $(document).ready(function(e){
 						})
 					}else{
 						swal.fire('Upsss...', resp.msj, 'error');
-						//location.href="?url=eventos";
+						location.href="?url=eventos";
 					}
 				})
 			return false;

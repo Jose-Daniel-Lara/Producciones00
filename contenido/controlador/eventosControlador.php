@@ -72,7 +72,8 @@ function registrarEvento($request,$files){
         return ['success'=>false, 'data'=>null, 'msj'=>'No se puede registrar un evento antes de 30 días'];
     }
     $evento = new Evento();
-    $evento->setCodigo($request['codigo']==0 ? rand(1000,900000) : $request['codigo']);
+    $codigo = ($request['codigo']==0 || $request['codigo']=='0') ? '' . rand(1000,900000) : ''.$request['codigo'];
+    $evento->setCodigo($codigo);
     $evento->setNombre($request['evento']);
     $evento->setTipoEvento($request['tipo']);
     $evento->setLugar($request['lugar']);
@@ -92,7 +93,7 @@ function registrarEvento($request,$files){
             || ($files["file"]["type"] == "image/gif")) {
             $nombre_imagen = "imagenes/".$evento->getCodigo()  . '_' .$files['file']['name'];
             if (move_uploaded_file($files["file"]["tmp_name"], $nombre_imagen)) {
-                $respImg = ['success'=>true, 'data'=>null, 'msj'=>''];
+                $respImg = ['success'=>true, 'data'=>null, 'msj'=>'img move uploaded'];
             } else {
                 $respImg =  ['success'=>false, 'data'=>null, 'msj'=>'Error al cargar archivo.'];
             }
@@ -102,21 +103,22 @@ function registrarEvento($request,$files){
         }
     }else{
         $nombre_imagen="";
-        $respImg =  ['success'=>true, 'data'=>null, 'msj'=>''];
+        $respImg =  ['success'=>true, 'data'=>null, 'msj'=>'img vacia'];
     }
 
     if ($respImg['success']){
-
-        if ($evento->getCodigo() == 0 || $evento->getCodigo() == '0'){
+        if ($request['op'] == 'addEvento'){
             $evento->setImagen($nombre_imagen);
             return $evento->insertEvento($evento);
-        }else{
+        }elseif($request['op'] == 'updateEvento'){
             if (strlen($nombre_imagen)>0){
                 $evento->setImagen($nombre_imagen);
             }else{
                 $evento->setImagen($request['imagen_anterior']);
             }
             return $evento->updateEvento($evento);
+        }else{
+            return ['success'=>false, 'data'=>null, 'msj'=>'Error: Operación No Permitida'];
         }
     }else{
         return $respImg;

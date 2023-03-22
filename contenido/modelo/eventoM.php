@@ -455,7 +455,7 @@ class eventoM extends BDConexion
             return [
                 'success'=> true,
                 'data'=>$this->con->lastInsertId(),
-                'msj' => ''
+                'msj' => 'Registro Insertado!!!'
             ];
         }catch(\Exception $e) {
             return [
@@ -485,7 +485,7 @@ class eventoM extends BDConexion
             return [
                 'success'=> true,
                 'data'=>null,
-                'msj' => ''
+                'msj' => 'Registro Editado!!!'
             ];
         }catch(\Exception $e) {
             return [
