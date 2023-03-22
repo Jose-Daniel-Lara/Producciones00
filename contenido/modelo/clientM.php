@@ -78,15 +78,17 @@ class clientM extends BDConexion
 
     }
 
-    public function consultarClientes()
-    {
+    public function consultarClientes(){
         try {
             $new = $this->con->prepare("SELECT * FROM `clientes` WHERE `status`='Disponible'");
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
-            return ['success'=>true, 'data'=>$data,'msj'=>''];
-        } catch (\Exception $error) {
-            return ['success'=>false, 'data'=>null,'msj'=>'consultarClientes: ' . $error->getMessage()];
+            return ['success'=>true, 'data'=>$data, 'msj'=>''];
+        }
+
+        catch(\Exception $error){
+            return ['success'=>false, 'data'=>null, 'msj'=>'consultarClientes: ' . $error->getMessage()];
+
         }
     }
 
@@ -167,15 +169,17 @@ class clientM extends BDConexion
 
     }
 
-    public function papeleraClientes()
-    {
+    public function papeleraClientes(){
         try {
             $new = $this->con->prepare("SELECT * FROM `clientes` WHERE  `status` ='Anulado'");
             $new->execute();
             $data = $new->fetchAll(\PDO::FETCH_OBJ);
-            return ['success'=>true, 'data'=>$data,'msj'=>''];
-        } catch (\Exception $error) {
-            return ['success'=>false, 'data'=>null,'msj'=>'papeleraClientes: ' . $error->getMessage()];
+            return ['success'=>true, 'data'=>$data, 'msj'=>''];
+        }
+
+        catch(\Exception $error){
+            return ['success'=>false, 'data'=>null, 'msj'=>'consultarClientes: ' . $error->getMessage()];
+
         }
     }
 

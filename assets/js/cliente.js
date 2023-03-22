@@ -2,18 +2,20 @@
 //------------------------------- FUNCION MOSTRAR AJAX ------------------------------//
 
 let tabla ;
-mostrarTabla();
 function mostrarTabla(){
     $.ajax({
         url: '',
         type: 'POST',
         dataType: 'JSON',
+        encode: true,
         data: {mostrar: 'mostrar', tabla: 'tabla'},
         success(response){
-
+            console.log(response);
             let lista = '';
-            response.forEach(fila => {
-                lista += `
+            if (response.success){
+                let data = response.data;
+                data.forEach(fila => {
+                    lista += `
 			       <tr class="fila">
                      <th class="text-left">${fila.cedula}</th>
                      <th class="text-left">${fila.nombre}</th>
@@ -27,7 +29,8 @@ function mostrarTabla(){
         
 			       </tr>
 					`
-            })
+                })
+            }
             $('#tbody').html(lista);
             tabla = $('#tablaClientes').DataTable({responsive: true});
         }
@@ -35,6 +38,8 @@ function mostrarTabla(){
 }
 
 $(document).ready(function(){
+
+    mostrarTabla();
 
     $(".ti").select2({
         theme:'bootstrap-5',
@@ -486,7 +491,7 @@ $(document).on('click', '.edit', function() {
             $('#nombre00').val(data[0].nombre);
             $('#apellido00').val(data[0].apellido);
             $('#telefono00').val(data[0].telefono);
-            $('#correo00').val(data[0].correo);
+            $('#correo00').val(data[0].correoElectronico);
         }
 
     })
@@ -598,12 +603,14 @@ function mostrarTablaR(){
         url: '',
         type: 'POST',
         dataType: 'JSON',
+        encode:true,
         data: {papelera: 'mostrar', tabla2: 'tabla2'},
         success(response){
-
             let lista2 = '';
-            response.forEach(fila => {
-                lista2 += `
+            if (response.success){
+                let data = response.data;
+                data.forEach(fila => {
+                    lista2 += `
               <tr class="fila">
                      <th class="text-left">${fila.cedula}</th>
                      <th class="text-left">${fila.nombre}</th>
@@ -617,7 +624,8 @@ function mostrarTablaR(){
         
               </tr>
           `
-            })
+                })
+            }
             $('#restaurarC').html(lista2);
             tabla2 = $('#tablaR').DataTable({responsive: true});
         }
