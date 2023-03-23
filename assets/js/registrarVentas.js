@@ -173,6 +173,8 @@ $('#configDesc').on('keyup',function(){
 
 $(document).ready(function(){
     var modalCrudDetalle = new bootstrap.Modal(document.getElementById('detalleVenta'));
+    var modalAnularVenta = new bootstrap.Modal(document.getElementById('modalAnularVenta'));
+
     $.fn.modal.Constructor.prototype.enforceFocus = function () {};
 
     $("#cedula").select2({
@@ -322,6 +324,49 @@ $(document).ready(function(){
         let venta_id = $(this).data('venta');
         cargarDetalleVenta(venta_id);
         modalCrudDetalle.show();
+    })
+
+    $('.anular-item_venta').on('click', function (){
+        let venta_id = $(this).data('venta');
+        $('#anular_venta_id').val(venta_id);
+        modalAnularVenta.show();
+    })
+
+    $('#btnAnularVenta').on('click', function (){
+        let venta_id = $('#anular_venta_id').val();
+
+        swal.fire({
+            title: '¿Seguro de Anular esta Venta?',
+            text: "Continúe para confirmar la Anulación...",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, Anular!',
+        }).then((result) => {
+            if (result.value){
+                $.ajax({
+                    url: '?url=ventas',
+                    type: 'POST',
+                    data: {
+                        op: 'anularVenta',
+                        venta_id: venta_id
+                    },
+                    dataType: 'json'
+                })
+                    .done(function(response){
+                        if (response.success){
+                            swal.fire('Anulado!', 'Venta Anulada', 'success');
+                        }else{
+                            swal.fire('Anulado!', response.msj, 'success');
+                        }
+                        location.href='?url=ventas';
+                    })
+                    .fail(function(){
+                        swal.fire('Upsss...', '¡Algo salió mal al anular!', 'error');
+                    });
+            } // fin de if (result.value)
+        })
     })
 
 });

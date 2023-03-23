@@ -53,7 +53,10 @@ $carrusel->carruselVentas();
 
                                     <a href="?url=reporteDetallesVenta&id=<?php echo $data->numeroVenta ?>" target="_blank" class="btn12 col-3.5 col-md-3 text-center pt-2 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de los detalles de la venta"><i class="bi bi-upload "  ></i></a>
 
-                                    <button class="btn btn11 col-3.5 col-md-3" type="button" data-bs-toggle="modal" data-bs-target="#exampleEliminarV" data-bs-toggle="tooltip" data-bs-placement="top" title="Anular Venta"><i class="bi bi-trash-fill "></i></button>
+                                    <button class="btn btn11 col-3.5 col-md-3 anular-item_venta" type="button"
+                                            title="Anular Venta" data-venta="<?php echo $data->numeroVenta ?>">
+                                        <i class="bi bi-trash-fill "></i>
+                                    </button>
                                 </td>
                             </tr>
                             <?php
@@ -254,7 +257,7 @@ $carrusel->carruselVentas();
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 
-<div class="modal fade mx-auto" id="exampleEliminarV" data-bs-backdrop="static" data-bs-keyboard="false"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade mx-auto" id="modalAnularVenta" data-bs-backdrop="static" data-bs-keyboard="false"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content w-500">
             <div class="contenido">
@@ -262,11 +265,14 @@ $carrusel->carruselVentas();
                     <h4 class="titulo fw-bold text-end mr-2 " data-text="Anular Venta">Venta</h4>
                 </div>
                 <div class="modal-body">
+                    <form class="contenido" method="POST" id="anularVenta">
+                        <input type="hidden" id="anular_venta_id" value="">
+                    </form>
                     ¿Deseas Anular esta Venta?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn11 btn-danger shadow"data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btnP btn-primary">Anular</button>
+                    <button type="button" id="btnAnularVenta" class="btn btnP btn-primary">Anular</button>
                 </div>
             </div>
 

@@ -4,7 +4,7 @@ use contenido\configuracion\conexion\BDConexion as BDConexion;
 
 class VentaM extends BDConexion{
     const VENTA_ESTATUS_DISPONIBLE = 'Disponible';
-    const VENTA_ESTATUS = 'Anulado';
+    const VENTA_ESTATUS_ANULADO = 'Anulado';
 
     private $numeroVenta;
     private $cedula;
@@ -158,6 +158,33 @@ class VentaM extends BDConexion{
         }
         catch(\Exception $error){
             return ['success'=>false, 'data'=>null, 'msj'=>'getDataDetalleVenta: ' . $error->getMessage()];
+        }
+    }
+
+    public function anularVenta($venta_id){
+        try {
+            $strSql ="UPDATE ventas SET status='" . self::VENTA_ESTATUS_ANULADO . "'  WHERE numeroVenta=?";
+
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, $venta_id);
+            $new->execute();
+
+            $strSql ="UPDATE detalleventa SET status='" . VentaDetalleM::E_ANULADA . "'  WHERE idVenta=?";
+            $new= $this->con->prepare($strSql);
+            $new->bindValue(1, $venta_id);
+            $new->execute();
+
+            return [
+                'success'=> true,
+                'data'=>null,
+                'msj' => 'Venta $venta_id Anulada'
+            ];
+        }catch(\Exception $e) {
+            return [
+                'success'=> false,
+                'data'=>-1,
+                'msj' => 'AnularVenta: ' .$e->getMessage()
+            ];
         }
     }
 

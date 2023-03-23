@@ -43,6 +43,10 @@ if (IS_AJAX){
             $resp = mostrarDetalleVentas($_REQUEST);
             echo json_encode($resp);
             break;
+        case 'anularVenta':
+            $resp = anularVenta($_REQUEST);
+            echo json_encode($resp);
+            break;
     }
 }else{
     $objeto = new Venta();
@@ -130,5 +134,10 @@ if (IS_AJAX){
         $venta = new Venta();
         $venta_id = $request['venta_id'];
         return $venta->getDataDetalleVenta($venta_id);
+    }
+
+    function anularVenta($request){
+        $objVenta = new Venta();
+        return $objVenta->anularVenta($request['venta_id']);
     }
  ?>
