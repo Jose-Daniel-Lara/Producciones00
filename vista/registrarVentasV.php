@@ -51,7 +51,7 @@ $carrusel->carruselVentas();
                                         <i class="ri-article-line "></i>
                                     </button>
 
-                                    <a href="?url=reporteDetallesVenta" target="_blank" class="btn12 col-3.5 col-md-3 text-center pt-2 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de los detalles de la venta"><i class="bi bi-upload "  ></i></a>
+                                    <a href="?url=reporteDetallesVenta&id=<?php echo $data->numeroVenta ?>" target="_blank" class="btn12 col-3.5 col-md-3 text-center pt-2 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de los detalles de la venta"><i class="bi bi-upload "  ></i></a>
 
                                     <button class="btn btn11 col-3.5 col-md-3" type="button" data-bs-toggle="modal" data-bs-target="#exampleEliminarV" data-bs-toggle="tooltip" data-bs-placement="top" title="Anular Venta"><i class="bi bi-trash-fill "></i></button>
                                 </td>
