@@ -172,7 +172,7 @@ $('#configDesc').on('keyup',function(){
 });
 
 $(document).ready(function(){
-
+    var modalCrudDetalle = new bootstrap.Modal(document.getElementById('detalleVenta'));
     $.fn.modal.Constructor.prototype.enforceFocus = function () {};
 
     $("#cedula").select2({
@@ -318,6 +318,12 @@ $(document).ready(function(){
         }
     })
 
+    $('.btnDetalleVenta').on('click', function () {
+        let venta_id = $(this).data('venta');
+        cargarDetalleVenta(venta_id);
+        modalCrudDetalle.show();
+    })
+
 });
 
 $('.más').on('click',function(e){
@@ -426,4 +432,54 @@ function getDataForm(operation){
         total: $('#totalGen').text(),
         detalle: arrayDetails
     };
+}
+
+function cargarDetalleVenta(venta_id) {
+    let data = {
+        op: 'showDetalleVenta',
+        venta_id: venta_id
+    }
+    console.log(data);
+    $.ajax({
+        url: '?url=ventas',
+        type: 'POST',
+        dataType: 'JSON',
+        data: data,
+        success(response) {
+            let lista = '';
+            if (response.success){
+                let sum_subtotal = 0.00;
+                let sum_descuento = 0.00;
+                let sum_total = 0.00;
+                let i=1;
+                let num_venta = '';
+                response.data.forEach(fila => {
+                    if (i==1){ num_venta = fila.numeroVenta;}
+                    let subtotal = parseFloat(fila.subTotal);
+                    let descuento = parseFloat(fila.descuento);
+                    let total = subtotal - descuento;
+                    sum_subtotal += subtotal;
+                    sum_descuento += descuento;
+                    sum_total += total;
+                    lista += `
+                      <tr class="fila">
+                      <td class="text-left">${fila.id_detalle}</td>
+                      <td class="text-left">${fila.evento}</td>
+                      <td class="text-center">${fila.mesa}</td>
+                      <td class="text-center">${fila.cant_entradas}</td>
+                      <td class="text-center">${fila.precio}</td>  
+                      <td class="text-center">${fila.subTotal}</td>
+                      <td class="text-center">${fila.descuento}</td>
+                      <td class="text-center">${total}</td>
+                     </tr>`
+                })
+                $('.numeroVenta').html('Venta N° ' + num_venta);
+                $('#tbody_detalleventa').empty().append(lista);
+                $('#monto-total-detalle-venta').html(sum_total);
+            }
+            else{
+
+            }
+        }
+    })
 }

@@ -136,6 +136,31 @@ class VentaM extends BDConexion{
         }
     }
 
+    public function getDataDetalleVenta($venta_id){
+        try {
+            $strSql = "SELECT v.numeroVenta, dv.codigo as id_detalle, e.nombre as evento,
+                CONCAT('F',m.posiFila,' - ','C',m.posiColumna) as mesa,
+                dv.cantEntradas as cant_entradas,
+                dv.precio, 
+                dv.descuento,
+                dv.subTotal 
+                FROM ventas v INNER JOIN detalleventa dv ON v.numeroVenta = dv.idVenta 
+                INNER JOIN eventos e ON e.codigo = dv.evento 
+                INNER JOIN mesas m ON m.id_mesa = dv.id_mesa 
+                WHERE v.numeroVenta=? AND  v.status = 'Disponible' AND dv.status = 'Disponible'
+                ORDER BY CONCAT('F',m.posiFila,' - ','C',m.posiColumna)";
+            $new = $this->con->prepare($strSql);
+            $new->bindValue(1, $venta_id);
+            $new->execute();
+            $data = $new->fetchAll(\PDO::FETCH_OBJ);
+
+            return ['success'=>true, 'data'=>$data, 'msj'=>''];
+        }
+        catch(\Exception $error){
+            return ['success'=>false, 'data'=>null, 'msj'=>'getDataDetalleVenta: ' . $error->getMessage()];
+        }
+    }
+
     /**
      * @return mixed
      */

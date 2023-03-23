@@ -39,6 +39,10 @@ if (IS_AJAX){
             $resp = storeVenta($_REQUEST);
             echo json_encode($resp);
             break;
+        case 'showDetalleVenta':
+            $resp = mostrarDetalleVentas($_REQUEST);
+            echo json_encode($resp);
+            break;
     }
 }else{
     $objeto = new Venta();
@@ -120,5 +124,11 @@ if (IS_AJAX){
             $venta->getConexion()->rollback();
             return ['success'=>false, 'data'=>null, 'msj'=>$e->getMessage()];
         }
+    }
+
+    function mostrarDetalleVentas($request){
+        $venta = new Venta();
+        $venta_id = $request['venta_id'];
+        return $venta->getDataDetalleVenta($venta_id);
     }
  ?>

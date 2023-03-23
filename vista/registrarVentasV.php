@@ -11,12 +11,9 @@ $carrusel->carruselVentas();
                 <h4 class="titulo fw-bold text-end mr-2 " data-text="Gestión de Ventas de Entradas">Ventas</h4>
             </div>
             <div class="d-grid gap-3 d-flex justify-content-md-end col-md-3 text-end justify-content-center">
-
                 <button class=" btn12 fw-bold col-3 col-lg-2" type="button"data-bs-toggle="modal" data-bs-target="#registrarV" style="box-shadow:none!important;" data-bs-toggle="tooltip" data-bs-placement="top" title="Registrar Venta"><i class="bx bxs-edit " style="font-size: 23px!important;"  ></i></button>
-
-                <a href="?url=reporteVentas" class="btn11 col-2 fw-bold col-md-3 col-lg-2 text-center pt-1 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de Ventas"><i class="bi bi-upload " style="font-size: 23px!important;"  ></i></a>
-
-                <a class=" fw-bold col-lg-2 col-3 text-center mt-1 " type="button" data-bs-toggle="modal" data-bs-target="#papeleraME" data-bs-toggle="tooltip" data-bs-placement="top" title="Papelera Venta"><i class="bi bi-trash icon999 " style="color: #fff; font-size: 30px;" ></i></a>
+                <a href="?url=reporteVentas" target="_blank" class="btn11 col-2 fw-bold col-md-3 col-lg-2 text-center pt-1 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de Ventas"><i class="bi bi-upload " style="font-size: 23px!important;"  ></i></a>
+                <!--<a class=" fw-bold col-lg-2 col-3 text-center mt-1 " type="button" data-bs-toggle="modal" data-bs-target="#papeleraME" data-bs-toggle="tooltip" data-bs-placement="top" title="Papelera Venta"><i class="bi bi-trash icon999 " style="color: #fff; font-size: 30px;" ></i></a>-->
 
 
             </div>
@@ -49,9 +46,12 @@ $carrusel->carruselVentas();
                                 <td class="text-left"><?php echo $data->metodo ?></td>
                                 <td class="text-left"><?php echo ($data->montoTotal - $data->descuento) ?></td>
                                 <td class="text-center d-grid gap-3 d-flex justify-content-lg-center" >
-                                    <button class="btn btn90 col-3.5 col-md-3 btnDetalleVenta" type="button" data-bs-toggle="modal" data-bs-target="#detalles" data-bs-toggle="tooltip" data-bs-placement="top" title="detalles"><i class="ri-article-line "></i></button>
+                                    <button class="btn btn90 col-3.5 col-md-3 btnDetalleVenta" type="button"
+                                            title="Detalles de Venta" data-venta="<?php echo $data->numeroVenta ?>">
+                                        <i class="ri-article-line "></i>
+                                    </button>
 
-                                    <a href="?url=reporteDetallesVenta" class="btn12 col-3.5 col-md-3 text-center pt-2 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de los detalles de la venta"><i class="bi bi-upload "  ></i></a>
+                                    <a href="?url=reporteDetallesVenta" target="_blank" class="btn12 col-3.5 col-md-3 text-center pt-2 " type="button" style="box-shadow:none!important;"  data-bs-toggle="tooltip" data-bs-placement="top" title="Reporte de los detalles de la venta"><i class="bi bi-upload "  ></i></a>
 
                                     <button class="btn btn11 col-3.5 col-md-3" type="button" data-bs-toggle="modal" data-bs-target="#exampleEliminarV" data-bs-toggle="tooltip" data-bs-placement="top" title="Anular Venta"><i class="bi bi-trash-fill "></i></button>
                                 </td>
@@ -275,7 +275,7 @@ $carrusel->carruselVentas();
 </div>
 
 
-<div class="modal fade mx-auto" id="detalles" data-bs-backdrop="static" data-bs-keyboard="false"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade mx-auto" id="detalleVenta" data-bs-backdrop="static" data-bs-keyboard="false"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered  modal-xl">
         <div class="modal-content w-500">
             <div class="contenido">
@@ -293,8 +293,8 @@ $carrusel->carruselVentas();
                                 <th  scope="col">N° de Mesa</th>
                                 <th  scope="col">N° de Entradas</th>
                                 <th  scope="col">Precio</th>
-                                <th  scope="col">Descuento</th>
                                 <th  scope="col">SubTotal</th>
+                                <th  scope="col">Descuento</th>
                                 <th  scope="col">Total</th>
                             </tr>
                             </thead>
@@ -305,7 +305,7 @@ $carrusel->carruselVentas();
                         <table class="table table-hover">
                             <thead class="d-grid gap-2 d-flex" >
                             <tr class="col-10 card-header text-end"style="color: #fff;">
-                                <th class="text-end">Monto Total</th>
+                                <th class="text-end">Monto Total:</th>
                             </tr>
                             <tr class=" col-2 fila text-end">
                                 <th id="monto-total-detalle-venta" class="text-end"></th>
